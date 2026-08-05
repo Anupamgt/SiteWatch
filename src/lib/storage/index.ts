@@ -37,6 +37,11 @@ export function getStorage(): StorageAdapter {
     const { createGcsStorage } = require("./gcs") as typeof import("./gcs");
     cached = createGcsStorage();
   } else {
+    if (process.env.NODE_ENV === "production" && process.env.VERCEL === "1") {
+      console.warn(
+        "[storage] STORAGE_DRIVER=local on Vercel is not durable; set STORAGE_DRIVER=gcs for photo uploads."
+      );
+    }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { createLocalStorage } = require("./local") as typeof import("./local");
     cached = createLocalStorage();

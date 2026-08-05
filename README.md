@@ -106,29 +106,25 @@ for Google-only accounts.
 
 ## Production deploy
 
-Build and run like any Next.js app:
+**Preferred path:** Vercel + Supabase. See **[DEPLOY.md](./DEPLOY.md)** for the full checklist
+(Google OAuth production redirects, env vars, smoke tests).
+
+Quick start:
 
 ```bash
 npm ci
-npx prisma generate
-npx prisma migrate deploy   # never `migrate dev` against production
-npm run build
-npm start                   # binds :3000; put a reverse proxy / PaaS router in front
+npm run build              # local verify
+# On Vercel, vercel.json runs: prisma generate && prisma migrate deploy && next build
 ```
 
 Required in production, at minimum:
 
-- `DATABASE_URL` pointing at your production Postgres (see Cloud SQL section below).
-- `NEXTAUTH_URL` set to the real public HTTPS origin, and a freshly generated `NEXTAUTH_SECRET`
-  (`openssl rand -base64 32` — do not reuse the dev value).
-- A non-`console` `EMAIL_PROVIDER` (`resend` or `smtp`) if you want corrective-action emails to
-  actually deliver; `console` just logs to stdout.
-- `STORAGE_DRIVER=gcs` (with `GCS_BUCKET`, `GCS_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS`) if
-  you're on a platform without a durable local filesystem (Cloud Run, most PaaS). The `local`
-  driver writes under `LOCAL_UPLOAD_DIR` (`./public/uploads` by default) and requires a persistent
-  volume if you use it in production.
-- Change every `SEED_*` credential (or don't run `db:seed` against production at all — it's meant
-  for demo/dev data).
+- `DATABASE_URL` / `DIRECT_URL` → Supabase poolers (see `.env.production.example`)
+- `NEXTAUTH_URL` = public HTTPS origin; fresh `NEXTAUTH_SECRET` (`openssl rand -base64 32`)
+- Google OAuth client with production origin + `/api/auth/callback/google` redirect
+- `EMAIL_PROVIDER=resend` or `smtp` when you need real corrective-action email (`console` only logs)
+- `STORAGE_DRIVER=gcs` on Vercel/Cloud Run (local disk is not durable)
+- Do not run `db:seed` against a live prod DB unless you intentionally want demo accounts
 
 ## Google Cloud SQL (production)
 
