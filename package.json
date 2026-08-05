@@ -12,6 +12,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
+    "db:register-google": "tsx scripts/register-google-user.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

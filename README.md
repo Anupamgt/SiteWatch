@@ -46,9 +46,13 @@ you change it back.
 
 ## Google OAuth
 
-1. Create OAuth credentials in Google Cloud Console (Web application).
-2. Authorized redirect URI: `http://localhost:3000/api/auth/callback/google` (and your prod URL).
-3. Set in `.env`:
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials) create an
+   **OAuth client ID** (Web application).
+2. Authorized JavaScript origins: `http://localhost:3000` (and your prod origin).
+3. Authorized redirect URIs:
+   - `http://localhost:3000/api/auth/callback/google`
+   - `https://YOUR_PROD_DOMAIN/api/auth/callback/google`
+4. Set in `.env`:
 
 ```bash
 GOOGLE_CLIENT_ID=...
@@ -56,9 +60,15 @@ GOOGLE_CLIENT_SECRET=...
 NEXTAUTH_URL=http://localhost:3000
 ```
 
-4. In **Admin → People**, create the user with the **exact Gmail address** they will use.
-   Google Sign-In is allow-list only — it does **not** auto-create users. Password is optional
-   for Google-only accounts.
+5. Allow-list each Gmail before they can sign in (exact address, lowercased):
+
+```bash
+npm run db:register-google -- you@gmail.com ADMIN "Your Name"
+# or create via Admin → People (password optional for Google-only accounts)
+```
+
+Google Sign-In is allow-list only — it does **not** auto-create users. Password is optional
+for Google-only accounts.
 
 ## Production deploy
 
