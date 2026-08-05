@@ -58,27 +58,47 @@ npx prisma migrate deploy
 npm run db:seed
 ```
 
-## Google OAuth
+## Supabase (PostgreSQL) + Google OAuth
 
-1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials) create an
-   **OAuth client ID** (Web application).
-2. Authorized JavaScript origins: `http://localhost:3000` (and your prod origin).
-3. Authorized redirect URIs:
-   - `http://localhost:3000/api/auth/callback/google`
-   - `https://YOUR_PROD_DOMAIN/api/auth/callback/google`
-4. Set in `.env`:
+SiteWatch uses **Supabase only as Postgres**. Auth stays on **NextAuth** (not Supabase Auth).
+
+### 1. Wire Supabase
+
+1. Supabase dashboard → your project → **Project Settings → Database**.
+2. Copy connection strings:
+   - **Transaction pooler** (port `6543`) → `DATABASE_URL`
+   - **Session pooler** or **Direct** (port `5432`) → `DIRECT_URL`
+3. Put them in `.env` (add `?schema=public` and `sslmode=require` if missing):
 
 ```bash
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-NEXTAUTH_URL=http://localhost:3000
+DATABASE_URL="postgresql://postgres.PROJECT:PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&schema=public"
+DIRECT_URL="postgresql://postgres.PROJECT:PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres?sslmode=require&schema=public"
 ```
 
-5. Allow-list each Gmail before they can sign in (exact address, lowercased):
+4. Apply schema + optional demo data:
+
+```bash
+npx prisma migrate deploy
+npm run db:seed
+```
+
+### 2. Wire Google OAuth
+
+1. [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) → **Create OAuth client ID** (Web application).
+2. **Authorized JavaScript origins:** `http://localhost:3000`
+3. **Authorized redirect URIs:** `http://localhost:3000/api/auth/callback/google`
+4. In `.env`:
+
+```bash
+GOOGLE_CLIENT_ID="....apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="GOCSPX-..."
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+5. Allow-list your Gmail (exact address), then restart `npm run dev`:
 
 ```bash
 npm run db:register-google -- you@gmail.com ADMIN "Your Name"
-# or create via Admin → People (password optional for Google-only accounts)
 ```
 
 Google Sign-In is allow-list only — it does **not** auto-create users. Password is optional
