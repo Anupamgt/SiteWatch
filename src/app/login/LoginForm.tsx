@@ -37,7 +37,9 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       return;
     }
 
-    router.push(callbackUrl);
+    // Always land on "/" so the server can role-route (admin → /admin, engineer → /sites).
+    // Trusting callbackUrl alone can send an engineer to /admin → 403 after an admin session.
+    router.push("/");
     router.refresh();
   }
 
@@ -96,7 +98,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           </div>
           <button
             type="button"
-            onClick={() => signIn("google", { callbackUrl })}
+            onClick={() => signIn("google", { callbackUrl: "/" })}
             className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-4 py-2 text-base font-medium text-slate-800 hover:bg-slate-50"
           >
             Continue with Google

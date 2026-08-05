@@ -6,10 +6,10 @@ export default withAuth(
     const token = req.nextauth.token;
     const { pathname } = req.nextUrl;
 
-    // Engineers may not reach /admin/*. This is a convenience redirect only —
-    // every API route re-checks authorization server-side (see lib/auth-guards.ts).
+    // Engineers may not reach /admin/*. Send them to their home instead of a dead-end 403
+    // when a leftover callbackUrl=/admin is present after login.
     if (pathname.startsWith("/admin") && token?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/403", req.url));
+      return NextResponse.redirect(new URL("/sites", req.url));
     }
 
     return NextResponse.next();
