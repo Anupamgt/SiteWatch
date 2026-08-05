@@ -104,7 +104,46 @@ npm run db:register-google -- you@gmail.com ADMIN "Your Name"
 Google Sign-In is allow-list only — it does **not** auto-create users. Password is optional
 for Google-only accounts.
 
-## Production deploy
+## Corrective-action email
+
+Creating an action (Admin → Corrective actions → New) emails the assigned engineer.
+Provider is selected with `EMAIL_PROVIDER` (`console` | `resend` | `smtp`).
+
+### Option A — Resend (best for Vercel)
+
+1. Create an API key at [resend.com](https://resend.com)
+2. In `.env` (and Vercel env):
+
+```bash
+EMAIL_PROVIDER="resend"
+MAIL_FROM="SiteWatch <onboarding@resend.dev>"   # or your verified domain
+RESEND_API_KEY="re_..."
+```
+
+3. Test:
+
+```bash
+npm run email:test -- you@gmail.com
+```
+
+### Option B — Gmail SMTP
+
+1. Google Account → Security → enable 2-Step Verification → create an **App password**
+2. In `.env`:
+
+```bash
+EMAIL_PROVIDER="smtp"
+MAIL_FROM="SiteWatch <you@gmail.com>"
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_USER="you@gmail.com"
+SMTP_PASSWORD="your-16-char-app-password"
+SMTP_SECURE="false"
+```
+
+3. `npm run email:test -- engineer@example.com`
+
+Failed sends still create the action (HTTP 201) and show **FAILED** in the admin list with **Resend email**.
 
 **Preferred path:** Vercel + Supabase. See **[DEPLOY.md](./DEPLOY.md)** for the full checklist
 (Google OAuth production redirects, env vars, smoke tests).

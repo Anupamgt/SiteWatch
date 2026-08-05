@@ -76,7 +76,7 @@ prisma generate && prisma migrate deploy && next build
 - [ ] Rotate DB password if it was shared in chat
 - [ ] Fresh `NEXTAUTH_SECRET` (not the local one)
 - [ ] Do not seed demo passwords on prod; remove or disable seed accounts
-- [ ] Set `EMAIL_PROVIDER=resend` (or smtp) for corrective-action mail
+- [ ] Set `EMAIL_PROVIDER=resend` (or smtp) for corrective-action mail — see README “Corrective-action email”; test with `npm run email:test -- you@gmail.com`
 - [ ] Set `STORAGE_DRIVER=gcs` + bucket credentials for photo attachments
 - [ ] Publish OAuth consent screen (or keep Testing + explicit test users)
 - [ ] Custom domain → update `NEXTAUTH_URL` + Google origins/redirects
