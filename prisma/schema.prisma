@@ -20,10 +20,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // Uncomment when using a pooled connection (e.g. PgBouncer) in front of Cloud SQL:
-  // directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Required for Supabase / PgBouncer poolers: app uses DATABASE_URL (pooled),
+  // migrations use DIRECT_URL (non-pooled / session mode).
+  directUrl = env("DIRECT_URL")
 }
 
 // ---------------------------------------------------------------------------

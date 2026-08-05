@@ -44,6 +44,20 @@ machine this was built on already had an unrelated Postgres container bound to 5
 `docker-compose.yml` and the matching `DATABASE_URL` in `.env.example`). Adjust both together if
 you change it back.
 
+## Supabase (optional cloud Postgres)
+
+Supabase is managed PostgreSQL — no schema rewrite needed.
+
+1. In the Supabase project: **Project Settings → Database → Connection string**.
+2. Put the **Transaction pooler** URI in `DATABASE_URL` (add `?pgbouncer=true` if missing).
+3. Put the **Session / Direct** URI in `DIRECT_URL` (used by `prisma migrate`).
+4. Apply schema + seed:
+
+```bash
+npx prisma migrate deploy
+npm run db:seed
+```
+
 ## Google OAuth
 
 1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials) create an
