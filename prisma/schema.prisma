@@ -1,0 +1,430 @@
+// DPR Site Control — Prisma schema
+// See ARCHITECTURE.md §2 for the reasoning behind this model.
+//
+// Targets Prisma 6.x. Validated with `prisma@6 validate`. Prisma 7 removed `url` from the
+// datasource block in favour of prisma.config.ts + driver adapters, so install `prisma@^6`
+// and `@prisma/client@^6` explicitly — a bare `npm i prisma` will pull v7 and fail to parse
+// this file.
+//
+// Key decisions encoded here:
+//   1. A Report is one row per (site, date). It owns the shared DPR header and holds two
+//      ReportSections (Work Programme, Labour Deployment) that are drafted and submitted
+//      independently but export into a single worksheet.
+//   2. Fields are hybrid: the DPR's known columns are real typed columns (so the dashboard and
+//      Excel export stay reliable), while admin-added columns live in `custom Json`. The
+//      FieldDefinition table drives which fields render, in what order, for which site.
+//   3. Credentials-only auth with a JWT session strategy, so no NextAuth adapter tables.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // Uncomment when using a pooled connection (e.g. PgBouncer) in front of Cloud SQL:
+  // directUrl = env("DIRECT_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  ENGINEER
+  ADMIN
+}
+
+enum SectionType {
+  WORK_PROGRAMME
+  LABOUR_DEPLOYMENT
+}
+
+enum SectionStatus {
+  DRAFT
+  SUBMITTED
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  DELAYED
+  ON_HOLD
+}
+
+enum ProductivityCheck {
+  LOW
+  NORMAL
+  HIGH
+  NOT_APPLICABLE
+}
+
+enum FieldType {
+  TEXT
+  TEXTAREA
+  NUMBER
+  DECIMAL
+  DATE
+  SELECT
+  MULTISELECT
+  BOOLEAN
+  PERCENT
+  PHOTO
+}
+
+enum CorrectiveActionStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+// ---------------------------------------------------------------------------
+// Identity & access
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  name         String
+  // Optional so Google OAuth users can sign in without a local password.
+  // Credentials login still requires a non-null hash.
+  passwordHash String?
+  role         Role    @default(ENGINEER)
+  phone        String?
+  isActive     Boolean @default(true)
+
+  memberships          SiteMembership[]
+  reportsCreated       Report[]           @relation("ReportCreatedBy")
+  reportsApproved      Report[]           @relation("ReportApprovedBy")
+  sectionsSubmitted    ReportSection[]    @relation("SectionSubmittedBy")
+  attachmentsUploaded  Attachment[]
+  actionsAssigned      CorrectiveAction[] @relation("ActionAssignedTo")
+  actionsCreated       CorrectiveAction[] @relation("ActionCreatedBy")
+  actionsClosed        CorrectiveAction[] @relation("ActionClosedBy")
+  auditLogs            AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([role, isActive])
+}
+
+model Site {
+  id               String  @id @default(cuid())
+  code             String  @unique // short slug, e.g. "BIJ"
+  name             String // "Bijapur Site"
+  projectName      String // "BRIJ Project"
+  locationZone     String? // "Bijapur"
+  contractorClient String? // "GRIL"
+  // Default shift length used to suggest (never force) Total Man-Hours.
+  standardShiftHours Decimal @default(8) @db.Decimal(4, 2)
+  isActive         Boolean @default(true)
+
+  memberships       SiteMembership[]
+  reports           Report[]
+  fieldDefinitions  FieldDefinition[]
+  correctiveActions CorrectiveAction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+// Engineers see only the sites they are a member of. Admins bypass this check
+// in code (lib/auth-guards.ts) rather than being given membership rows.
+model SiteMembership {
+  id     String @id @default(cuid())
+  userId String
+  siteId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, siteId])
+  @@index([siteId])
+}
+
+// ---------------------------------------------------------------------------
+// Reports
+// ---------------------------------------------------------------------------
+
+// One DPR per site per calendar day. Header values are snapshotted here rather
+// than joined from Site so that a historical report keeps the names and
+// contractor that were true on that date.
+model Report {
+  id         String   @id @default(cuid())
+  siteId     String
+  reportDate DateTime @db.Date
+
+  projectName       String
+  locationZone      String?
+  contractorClient  String?
+  siteEngineerName  String?
+  siteSupervisorName String?
+  weatherCondition  String? // free text: "Clear / Normal Work", "Heavy Rain", ...
+  dayOfWeek         String? // stored, not derived, to avoid timezone drift
+
+  createdById  String?
+  approvedById String?
+  approvedAt   DateTime?
+
+  site              Site               @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  createdBy         User?              @relation("ReportCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  approvedBy        User?              @relation("ReportApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull)
+  sections          ReportSection[]
+  correctiveActions CorrectiveAction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([siteId, reportDate])
+  @@index([siteId, reportDate])
+}
+
+// The unit of draft/resume and submission. Each report has at most one section
+// per SectionType; the engineer picks which one to fill.
+model ReportSection {
+  id       String        @id @default(cuid())
+  reportId String
+  type     SectionType
+  status   SectionStatus @default(DRAFT)
+
+  submittedById String?
+  submittedAt   DateTime?
+  lastSavedAt   DateTime?
+
+  report      Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  submittedBy User?  @relation("SectionSubmittedBy", fields: [submittedById], references: [id], onDelete: SetNull)
+
+  taskRows   TaskRow[]
+  labourRows LabourRow[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([reportId, type])
+  @@index([status])
+}
+
+// Report type 1 — WORK PROGRAMME & TASK EXECUTION LOG
+model TaskRow {
+  id        String @id @default(cuid())
+  sectionId String
+  sortOrder Int    @default(0)
+
+  taskCode               String? // "TSK-01"
+  locationStructure      String? // "Zone A - Footing F3-F7"
+  plannedWorkDescription String?
+  primaryTradeLead       String? // "Bar Bender", "Carpenter", ...
+  targetQty              Decimal?   @db.Decimal(14, 3)
+  achievedQty            Decimal?   @db.Decimal(14, 3)
+  unit                   String? // "Kg", "SqM", "CuM", "Nos", "LS", "Joints"
+  // Fraction, NOT 0-100. Excel stores 0.9333 with a percent format, and values
+  // above 1 are legitimate (sample TSK-04 = 1.0625). Do not clamp.
+  percentComplete        Float?
+  status                 TaskStatus @default(NOT_STARTED)
+  varianceReason         String?
+  correctiveActionNote   String? // "Corrective Action (HO Guidance)" free text on the sheet
+
+  // Admin-defined extra fields, keyed by FieldDefinition.key.
+  custom Json @default("{}")
+
+  section           ReportSection      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  attachments       Attachment[]
+  correctiveActions CorrectiveAction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sectionId, sortOrder])
+}
+
+// Report type 2 — DAILY LABOUR DEPLOYMENT & PRODUCTIVITY CONTROL
+model LabourRow {
+  id        String @id @default(cuid())
+  sectionId String
+  sortOrder Int    @default(0)
+
+  labourCategory       String? // "Carpenter (Formwork)"
+  contractorGangLeader String? // "Apex Civil Ltd"
+  plannedStaff         Int?
+  actualPresent        Int?
+  otHours              Decimal? @db.Decimal(8, 2)
+  // Engineer-entered. In the sample this is NOT actualPresent*8 + otHours,
+  // so only ever suggest a default; never overwrite the entered value.
+  totalManHours        Decimal? @db.Decimal(10, 2)
+  assignedWorkArea     String?
+  outputDeliveredToday String?
+  // Free text on the sheet ("20 SqM / Man-Day", "N/A") — deliberately not numeric.
+  targetStdRate        String?
+  productivityCheck    ProductivityCheck @default(NORMAL)
+  supervisorRemarks    String?
+
+  custom Json @default("{}")
+
+  section ReportSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sectionId, sortOrder])
+}
+
+// ---------------------------------------------------------------------------
+// Dynamic field configuration
+// ---------------------------------------------------------------------------
+
+// siteId = null  -> global default template (seeded for both section types)
+// siteId set     -> site-level override or site-specific custom field
+//
+// isSystem = true rows map onto real columns of TaskRow/LabourRow via `key`.
+// They can be hidden, relabelled, and reordered but not deleted.
+// isSystem = false rows are stored in the row's `custom` JSON under `key`.
+model FieldDefinition {
+  id          String      @id @default(cuid())
+  siteId      String?
+  sectionType SectionType
+
+  key         String // camelCase; for system fields this matches the column name
+  label       String
+  fieldType   FieldType @default(TEXT)
+  order       Int       @default(0)
+  isSystem    Boolean   @default(false)
+  isRequired  Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  options     String[]  @default([]) // SELECT / MULTISELECT choices
+  placeholder String?
+  helpText    String?
+  defaultValue String?
+
+  site Site? @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([siteId, sectionType, key])
+  @@index([siteId, sectionType, order])
+}
+
+// ---------------------------------------------------------------------------
+// Attachments
+// ---------------------------------------------------------------------------
+
+model Attachment {
+  id         String  @id @default(cuid())
+  taskRowId  String
+  url        String
+  storageKey String // path/object name in the local dir or GCS bucket
+  filename   String
+  mimeType   String
+  sizeBytes  Int
+  uploadedById String?
+
+  taskRow    TaskRow @relation(fields: [taskRowId], references: [id], onDelete: Cascade)
+  uploadedBy User?   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([taskRowId])
+}
+
+// ---------------------------------------------------------------------------
+// Corrective actions
+// ---------------------------------------------------------------------------
+
+// "Overdue" is intentionally NOT a column: it is derived as
+//   status != CLOSED && dueDate != null && dueDate < startOfToday()
+// A stored flag would go stale without a scheduled job.
+model CorrectiveAction {
+  id        String  @id @default(cuid())
+  siteId    String
+  reportId  String?
+  taskRowId String?
+
+  title       String
+  description String?
+  guidance    String? // HO guidance sent to the engineer
+
+  status   CorrectiveActionStatus @default(OPEN)
+  priority Priority               @default(MEDIUM)
+  dueDate  DateTime?              @db.Date
+
+  assignedToId String
+  createdById  String
+  closedById   String?
+  closedAt     DateTime?
+  closureNote  String?
+
+  site       Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  report     Report?  @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  // SetNull, not Cascade: deleting a task row must not erase the audit trail.
+  taskRow    TaskRow? @relation(fields: [taskRowId], references: [id], onDelete: SetNull)
+  assignedTo User     @relation("ActionAssignedTo", fields: [assignedToId], references: [id])
+  createdBy  User     @relation("ActionCreatedBy", fields: [createdById], references: [id])
+  closedBy   User?    @relation("ActionClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+
+  emails EmailLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([siteId, status])
+  @@index([assignedToId, status])
+  @@index([status, dueDate]) // backs the overdue query
+}
+
+// ---------------------------------------------------------------------------
+// Observability
+// ---------------------------------------------------------------------------
+
+model EmailLog {
+  id                 String      @id @default(cuid())
+  correctiveActionId String?
+  to                 String
+  subject            String
+  provider           String // "resend" | "smtp" | "console"
+  status             EmailStatus @default(QUEUED)
+  providerMessageId  String?
+  error              String?
+  sentAt             DateTime?
+
+  correctiveAction CorrectiveAction? @relation(fields: [correctiveActionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([correctiveActionId])
+  @@index([status])
+}
+
+model AuditLog {
+  id         String  @id @default(cuid())
+  actorId    String?
+  action     String // "section.submit", "field.reorder", "action.close", ...
+  entityType String
+  entityId   String
+  metadata   Json    @default("{}")
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+}
