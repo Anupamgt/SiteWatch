@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { ResolvedFieldDefinition } from "@/lib/fields";
 import { DynamicRowForm, type RowValues } from "@/components/DynamicRowForm";
 import { StatusBadge } from "@/components/StatusBadge";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 type EditableRow = RowValues & {
   id?: string;
@@ -53,13 +54,17 @@ function applyDerivedDefaults(
   return row;
 }
 
-function rowSummary(row: EditableRow, fields: ResolvedFieldDefinition[]): { title: string; subtitle: string } {
+function rowSummary(
+  row: EditableRow,
+  fields: ResolvedFieldDefinition[],
+  untitledLabel: string,
+): { title: string; subtitle: string } {
   const primary = fields[0];
   const secondary = fields.find((f) => f.fieldType === "TEXTAREA") ?? fields[1];
   const titleVal = primary ? row[primary.key] : null;
   const subtitleVal = secondary ? row[secondary.key] : null;
   return {
-    title: (titleVal as string) || "Untitled row",
+    title: (titleVal as string) || untitledLabel,
     subtitle: (subtitleVal as string) || "",
   };
 }
@@ -87,6 +92,7 @@ export function SectionEditor({
   siteId?: string;
   ticketOptions?: Array<{ id: string; title: string; status: string }>;
 }) {
+  const { t, ticketStatus } = useI18n();
   const [rows, setRows] = useState<EditableRow[]>(() => initialRows.map(toEditableRow));
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [status, setStatus] = useState(initialStatus);
@@ -162,9 +168,9 @@ export function SectionEditor({
   }
 
   const addCtaLabel =
-    sectionType === "WORK_PROGRAMME" ? "+ Add work that day" : "+ Add labour for that day";
+    sectionType === "WORK_PROGRAMME" ? t("section.addWork") : t("section.addLabour");
   const addPanelTitle =
-    sectionType === "WORK_PROGRAMME" ? "Enter work for that day" : "Enter labour for that day";
+    sectionType === "WORK_PROGRAMME" ? t("section.enterWork") : t("section.enterLabour");
 
   function addRow() {
     const newRow: EditableRow = {
@@ -264,7 +270,7 @@ export function SectionEditor({
           <ul className="space-y-2">
             {rows.map((row, index) => {
               const expanded = expandedIndex === index;
-              const { title, subtitle } = rowSummary(row, fields);
+              const { title, subtitle } = rowSummary(row, fields, t("section.untitledRow"));
               return (
                 <li key={row._localKey} className="rounded-lg border border-slate-200 bg-white shadow-sm">
                   <button
@@ -304,8 +310,8 @@ export function SectionEditor({
                       />
                       {sectionType === "WORK_PROGRAMME" && siteId && (
                         <label className="mt-4 block text-sm">
-                          <span className="mb-1 block font-medium text-slate-700">
-                            Link to ticket (work order)
+                          <span className="mb-1.5 block text-base font-medium text-slate-800">
+                            {t("tickets.linkToTicket")}
                           </span>
                           <select
                             value={row.ticketId ?? ""}
@@ -313,21 +319,21 @@ export function SectionEditor({
                             onChange={(e) =>
                               updateRowField(index, "ticketId", e.target.value || null)
                             }
-                            className="min-h-11 w-full rounded-md border px-3 disabled:bg-slate-50"
+                            className="min-h-12 w-full rounded-lg border px-3 text-base disabled:bg-slate-50"
                           >
-                            <option value="">— None —</option>
-                            {ticketOptions.map((t) => (
-                              <option key={t.id} value={t.id}>
-                                {t.title} ({t.status.replaceAll("_", " ")})
+                            <option value="">{t("tickets.linkNone")}</option>
+                            {ticketOptions.map((opt) => (
+                              <option key={opt.id} value={opt.id}>
+                                {opt.title} ({ticketStatus(opt.status)})
                               </option>
                             ))}
                             {row.ticketId &&
-                              !ticketOptions.some((t) => t.id === row.ticketId) && (
-                                <option value={row.ticketId}>Linked ticket (closed/other)</option>
+                              !ticketOptions.some((opt) => opt.id === row.ticketId) && (
+                                <option value={row.ticketId}>{t("tickets.linkOther")}</option>
                               )}
                           </select>
-                          <span className="mt-1 block text-xs text-slate-500">
-                            Connect this daily DPR task to a raised ticket for progress tracking.
+                          <span className="mt-1.5 block text-sm leading-relaxed text-slate-500">
+                            {t("tickets.linkToTicketHelp")}
                           </span>
                         </label>
                       )}
@@ -336,9 +342,9 @@ export function SectionEditor({
                           <button
                             type="button"
                             onClick={() => removeRow(index)}
-                            className="min-h-9 rounded-md border border-red-200 px-3 text-sm font-medium text-red-700 hover:bg-red-50"
+                            className="min-h-10 rounded-lg border border-red-200 px-3 text-sm font-medium text-red-700 hover:bg-red-50"
                           >
-                            Remove
+                            {t("section.removeRow")}
                           </button>
                         </div>
                       )}
@@ -352,7 +358,7 @@ export function SectionEditor({
 
         <div className="pt-2">
           <Link href={backHref} className="text-sm font-medium text-slate-500 hover:text-slate-800">
-            ← Back to report
+            {t("section.backToReport")}
           </Link>
         </div>
       </main>
@@ -367,38 +373,38 @@ export function SectionEditor({
                 <button
                   type="button"
                   onClick={saveDraft}
-                  className="min-h-11 shrink-0 rounded-md border border-slate-300 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  className="min-h-12 shrink-0 rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                 >
-                  Save draft
+                  {t("section.saveDraft")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmingSubmit(true)}
                   disabled={rows.length === 0}
-                  className="min-h-11 shrink-0 rounded-md bg-amber-500 px-4 text-sm font-semibold text-slate-900 hover:bg-amber-400 disabled:opacity-50"
+                  className="min-h-12 shrink-0 rounded-lg bg-amber-500 px-4 text-sm font-semibold text-slate-900 hover:bg-amber-400 disabled:opacity-50"
                 >
-                  Submit
+                  {t("section.submit")}
                 </button>
               </>
             ) : (
               <>
                 <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700">
-                  Submit {sectionLabel}?
+                  {t("section.confirmSubmit")}
                 </span>
                 <button
                   type="button"
                   onClick={() => setConfirmingSubmit(false)}
-                  className="min-h-11 shrink-0 rounded-md border border-slate-300 px-3 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                  className="min-h-12 shrink-0 rounded-lg border border-slate-300 px-3 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </button>
                 <button
                   type="button"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="min-h-11 shrink-0 rounded-md bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-60"
+                  className="min-h-12 shrink-0 rounded-lg bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-60"
                 >
-                  {submitting ? "Submitting…" : "Yes, submit"}
+                  {submitting ? t("section.submitting") : t("section.yesSubmit")}
                 </button>
               </>
             )}

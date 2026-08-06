@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/TopBar";
 import { RaiseTicketForm } from "@/components/tickets/RaiseTicketForm";
+import { getDictionary } from "@/lib/i18n";
 
 export default async function NewTicketPage({
   searchParams,
@@ -9,6 +10,7 @@ export default async function NewTicketPage({
   searchParams: Promise<{ siteId?: string }>;
 }) {
   const user = await requireUser();
+  const { dict } = await getDictionary();
   const sp = await searchParams;
 
   const sites =
@@ -26,22 +28,15 @@ export default async function NewTicketPage({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <TopBar title="Raise ticket" userName={user.name ?? undefined} backHref="/tickets" />
+      <TopBar title={dict.tickets.raiseTitle} userName={user.name ?? undefined} backHref="/tickets" />
       <main className="mx-auto w-full max-w-xl flex-1 space-y-4 px-4 py-5">
-        <p className="text-sm text-slate-500">
-          Create a work order and assign one or more people. Assignees link daily DPR tasks to this
-          ticket; you close it after review.
-        </p>
+        <p className="text-sm leading-relaxed text-slate-600">{dict.tickets.raiseHelp}</p>
         {sites.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-slate-500">
-            No sites available.
+          <p className="rounded-xl border border-dashed p-6 text-center text-sm text-slate-500">
+            {dict.common.noSites}
           </p>
         ) : (
-          <RaiseTicketForm
-            sites={sites}
-            defaultSiteId={sp.siteId}
-            cancelHref="/tickets"
-          />
+          <RaiseTicketForm sites={sites} defaultSiteId={sp.siteId} cancelHref="/tickets" />
         )}
       </main>
     </div>

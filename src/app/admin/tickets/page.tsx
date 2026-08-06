@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { TicketsHomePanel } from "@/components/tickets/TicketsHomePanel";
+import { getDictionary } from "@/lib/i18n";
 
 export default async function AdminTicketsPage({
   searchParams,
@@ -9,6 +10,7 @@ export default async function AdminTicketsPage({
   searchParams: Promise<{ includeClosed?: string; siteId?: string }>;
 }) {
   await requireAdmin();
+  const { dict } = await getDictionary();
   const sp = await searchParams;
   const includeClosed = sp.includeClosed === "1";
 
@@ -37,22 +39,26 @@ export default async function AdminTicketsPage({
     <main className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Tickets</h1>
-          <p className="text-sm text-slate-500">Portfolio work orders. Soft-delete is admin-only.</p>
+          <h1 className="text-2xl font-semibold text-slate-900">{dict.tickets.wordPlural}</h1>
+          <p className="text-sm leading-relaxed text-slate-500">{dict.tickets.listHelp}</p>
         </div>
         <Link
           href="/tickets/new"
-          className="rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900"
+          className="rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-slate-900"
         >
-          + Raise ticket
+          {dict.tickets.raise}
         </Link>
       </div>
 
-      <form method="get" className="flex flex-wrap items-end gap-2 rounded-lg border bg-white p-3">
+      <form method="get" className="flex flex-wrap items-end gap-2 rounded-xl border bg-white p-3">
         <label className="text-sm">
-          <span className="mb-1 block text-xs text-slate-500">Site</span>
-          <select name="siteId" defaultValue={sp.siteId ?? ""} className="min-h-10 rounded-md border px-3">
-            <option value="">All sites</option>
+          <span className="mb-1 block text-xs text-slate-500">{dict.tickets.site}</span>
+          <select
+            name="siteId"
+            defaultValue={sp.siteId ?? ""}
+            className="min-h-11 rounded-lg border px-3"
+          >
+            <option value="">{dict.common.all}</option>
             {sites.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.code} — {s.name}
@@ -60,12 +66,12 @@ export default async function AdminTicketsPage({
             ))}
           </select>
         </label>
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex min-h-11 items-center gap-2 text-sm">
           <input type="checkbox" name="includeClosed" value="1" defaultChecked={includeClosed} />
-          Include closed
+          {dict.tickets.showClosed}
         </label>
-        <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm text-white">
-          Apply
+        <button type="submit" className="min-h-11 rounded-lg bg-slate-900 px-4 text-sm text-white">
+          {dict.common.apply}
         </button>
       </form>
 
@@ -73,7 +79,7 @@ export default async function AdminTicketsPage({
         tickets={tickets}
         raiseHref="/tickets/new"
         listHref="/admin/tickets"
-        title={includeClosed ? "All tickets" : "Open tickets"}
+        title={includeClosed ? dict.tickets.allTitle : dict.tickets.openTitle}
       />
     </main>
   );

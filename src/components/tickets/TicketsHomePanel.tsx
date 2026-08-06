@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export type TicketListItem = {
   id: string;
@@ -14,51 +17,62 @@ export function TicketsHomePanel({
   tickets,
   raiseHref,
   listHref,
-  title = "Open tickets",
+  title,
 }: {
   tickets: TicketListItem[];
   raiseHref: string;
   listHref: string;
   title?: string;
 }) {
+  const { t, ticketStatus } = useI18n();
+  const heading = title ?? t("tickets.openTitle");
+
   return (
     <section className="space-y-2">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold text-slate-800">{title}</h2>
-          <p className="text-xs text-slate-500">Work orders assigned to you or raised by you.</p>
+          <h2 className="text-base font-semibold text-slate-800">{heading}</h2>
+          <p className="mt-0.5 text-sm text-slate-500">{t("tickets.openHelp")}</p>
         </div>
         <div className="flex gap-3 text-sm">
-          <Link href={raiseHref} className="font-medium text-amber-700 hover:underline">
-            Raise ticket
+          <Link
+            href={raiseHref}
+            className="rounded-md bg-amber-500 px-3 py-1.5 font-semibold text-slate-900"
+          >
+            {t("tickets.raise")}
           </Link>
-          <Link href={listHref} className="font-medium text-slate-600 hover:underline">
-            All →
+          <Link
+            href={listHref}
+            className="self-center font-medium text-slate-600 hover:underline"
+          >
+            {t("tickets.viewAll")} →
           </Link>
         </div>
       </div>
 
       {tickets.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500">
-          No open tickets.
+        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-5 text-center text-sm text-slate-500">
+          {t("tickets.empty")}
         </p>
       ) : (
-        <ul className="divide-y rounded-lg border border-slate-200 bg-white">
-          {tickets.map((t) => (
-            <li key={t.id}>
+        <ul className="divide-y rounded-lg border border-slate-200 bg-white shadow-sm">
+          {tickets.map((item) => (
+            <li key={item.id}>
               <Link
-                href={`/tickets/${t.id}`}
-                className="flex items-start justify-between gap-3 px-4 py-3 hover:bg-slate-50"
+                href={`/tickets/${item.id}`}
+                className="flex items-start justify-between gap-3 px-4 py-3.5 hover:bg-slate-50 active:bg-slate-100"
               >
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-slate-900">{t.title}</p>
-                  <p className="text-xs text-slate-500">
-                    {t.site.code} · {t.raisedBy.name} →{" "}
-                    {t.assignees.map((a) => a.user.name).join(", ") || "—"}
+                  <p className="truncate text-base font-medium text-slate-900">{item.title}</p>
+                  <p className="mt-0.5 text-sm text-slate-500">
+                    {item.site.code} · {t("tickets.raisedBy")} {item.raisedBy.name}
+                    {item.assignees.length > 0
+                      ? ` → ${item.assignees.map((a) => a.user.name).join(", ")}`
+                      : ""}
                   </p>
                 </div>
-                <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
-                  {t.status.replaceAll("_", " ")}
+                <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                  {ticketStatus(item.status)}
                 </span>
               </Link>
             </li>

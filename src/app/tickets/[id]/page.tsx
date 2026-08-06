@@ -5,6 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { TicketDetailClient, type TicketDetail } from "@/components/tickets/TicketDetailClient";
 import { listAssignableUsers, ticketInclude } from "@/lib/tickets";
 import { formatDateOnly } from "@/lib/dates";
+import { getDictionary } from "@/lib/i18n";
 
 export default async function TicketDetailPage({
   params,
@@ -12,6 +13,7 @@ export default async function TicketDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const user = await requireUser();
+  const { dict } = await getDictionary();
   const { id } = await params;
 
   const ticket = await prisma.ticket.findFirst({
@@ -61,7 +63,7 @@ export default async function TicketDetailPage({
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar
-        title="Ticket"
+        title={dict.tickets.word}
         userName={user.name ?? undefined}
         backHref="/tickets"
       />

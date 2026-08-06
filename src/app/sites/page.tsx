@@ -6,9 +6,11 @@ import { TopBar } from "@/components/TopBar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getOpenTicketsForHomepages } from "@/lib/tickets";
 import { TicketsHomePanel } from "@/components/tickets/TicketsHomePanel";
+import { getDictionary } from "@/lib/i18n";
 
 export default async function SitesPage() {
   const user = await requireUser();
+  const { dict } = await getDictionary();
   const today = todayInAppTimezone();
   const todayDate = parseDateOnly(today);
 
@@ -35,17 +37,19 @@ export default async function SitesPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <TopBar title="My Sites" userName={user.name ?? undefined} />
+      <TopBar title={dict.sites.pageTitle} userName={user.name ?? undefined} />
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-slate-500">Today — {formatDisplayDate(todayDate)}</p>
+          <p className="text-sm text-slate-500">
+            {dict.common.today} — {formatDisplayDate(todayDate)}
+          </p>
           <div className="flex gap-3 text-sm">
             <Link href="/tickets" className="font-medium text-amber-700 hover:underline">
-              Tickets →
+              {dict.nav.tickets} →
             </Link>
             <Link href="/machines" className="font-medium text-amber-700 hover:underline">
-              Machines →
+              {dict.nav.machines} →
             </Link>
           </div>
         </div>
@@ -59,9 +63,8 @@ export default async function SitesPage() {
         </div>
 
         {sites.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
-            No sites assigned yet. Contact your administrator.
-            {user.role === "SUPERVISOR" ? " (Site supervisors cannot access People.)" : ""}
+          <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+            {dict.common.noSites}
           </div>
         ) : (
           <ul className="space-y-3">
@@ -74,11 +77,11 @@ export default async function SitesPage() {
                 <li key={site.id}>
                   <Link
                     href={`/sites/${site.id}`}
-                    className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm active:bg-slate-50"
+                    className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm active:bg-slate-50"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="truncate text-base font-semibold text-slate-900">{site.name}</p>
+                        <p className="truncate text-lg font-semibold text-slate-900">{site.name}</p>
                         <p className="text-sm text-slate-500">
                           {site.code} · {site.projectName}
                         </p>
@@ -88,12 +91,12 @@ export default async function SitesPage() {
                       </span>
                     </div>
 
-                    <div className="mt-3 flex gap-2">
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
                       <StatusBadge value={work?.status ?? "NOT_STARTED"} />
-                      <span className="self-center text-xs text-slate-400">Work Programme</span>
+                      <span className="text-xs text-slate-400">{dict.sites.workProgramme}</span>
                       <span className="mx-1 text-slate-300">·</span>
                       <StatusBadge value={labour?.status ?? "NOT_STARTED"} />
-                      <span className="self-center text-xs text-slate-400">Labour</span>
+                      <span className="text-xs text-slate-400">{dict.sites.labour}</span>
                     </div>
                   </Link>
                 </li>
