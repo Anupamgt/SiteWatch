@@ -125,7 +125,23 @@ const WORK_PROGRAMME_FIELDS: FieldSeed[] = [
 
 // Column order matches ARCHITECTURE.md §8.5 (A -> K).
 const LABOUR_FIELDS: FieldSeed[] = [
-  { key: "labourCategory", label: "Labour Category", fieldType: "TEXT", order: 0, isRequired: true },
+  {
+    key: "labourCategory",
+    label: "Labour Type",
+    fieldType: "SELECT",
+    order: 0,
+    isRequired: true,
+    options: [
+      "Carpenter",
+      "Mason",
+      "Bar Bender",
+      "Welder",
+      "Gang Leader",
+      "Operator",
+      "Helper",
+    ],
+    helpText: "Select the labour trade / type for this row.",
+  },
   { key: "contractorGangLeader", label: "Contractor / Gang Leader", fieldType: "TEXT", order: 1 },
   { key: "plannedStaff", label: "Planned Staff", fieldType: "NUMBER", order: 2, isRequired: true },
   { key: "actualPresent", label: "Actual Present", fieldType: "NUMBER", order: 3, isRequired: true },
