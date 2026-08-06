@@ -5,7 +5,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { I18nProvider } from "@/components/i18n/I18nProvider";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

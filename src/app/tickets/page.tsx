@@ -3,7 +3,7 @@ import { requireUser } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/TopBar";
 import { TicketsHomePanel } from "@/components/tickets/TicketsHomePanel";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function TicketsListPage({
   searchParams,

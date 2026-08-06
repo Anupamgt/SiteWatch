@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth-guards";
 import { TopBar } from "@/components/TopBar";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await requireAdmin();

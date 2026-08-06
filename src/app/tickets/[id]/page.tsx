@@ -5,7 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { TicketDetailClient, type TicketDetail } from "@/components/tickets/TicketDetailClient";
 import { listAssignableUsers, ticketInclude } from "@/lib/tickets";
 import { formatDateOnly } from "@/lib/dates";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function TicketDetailPage({
   params,

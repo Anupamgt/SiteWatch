@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { LoginForm } from "./LoginForm";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function LoginPage() {
   const { dict } = await getDictionary();

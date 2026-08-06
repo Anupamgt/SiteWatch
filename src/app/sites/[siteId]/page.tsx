@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { GoToDateForm } from "@/components/GoToDateForm";
 import { getDashboardInsights } from "@/lib/dashboardInsights";
 import { DashboardInsightsPanel } from "@/components/DashboardInsightsPanel";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function SiteHomePage({
   params,

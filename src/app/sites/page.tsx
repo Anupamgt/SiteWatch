@@ -6,7 +6,7 @@ import { TopBar } from "@/components/TopBar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getOpenTicketsForHomepages } from "@/lib/tickets";
 import { TicketsHomePanel } from "@/components/tickets/TicketsHomePanel";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function SitesPage() {
   const user = await requireUser();

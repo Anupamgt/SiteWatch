@@ -2,7 +2,7 @@ import { requireUser } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { TopBar } from "@/components/TopBar";
 import { RaiseTicketForm } from "@/components/tickets/RaiseTicketForm";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n/server";
 
 export default async function NewTicketPage({
   searchParams,
