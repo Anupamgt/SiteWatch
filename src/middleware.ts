@@ -33,6 +33,6 @@ export const config = {
     "/machines/:path*",
     "/tickets",
     "/tickets/:path*",
-    "/api/((?!auth).*)",
+    "/api/((?!auth|locale).*)",
   ],
 };
