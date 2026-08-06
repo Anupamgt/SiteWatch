@@ -152,6 +152,11 @@ export function SectionEditor({
     });
   }
 
+  const addCtaLabel =
+    sectionType === "WORK_PROGRAMME" ? "+ Add work that day" : "+ Add labour for that day";
+  const addPanelTitle =
+    sectionType === "WORK_PROGRAMME" ? "Enter work for that day" : "Enter labour for that day";
+
   function addRow() {
     const newRow: EditableRow = {
       sortOrder: rows.length,
@@ -160,8 +165,10 @@ export function SectionEditor({
     for (const f of fields) {
       newRow[f.key] = emptyValueFor(f);
     }
+    const nextIndex = rows.length;
     setRows((prev) => [...prev, newRow]);
-    setExpandedIndex(rows.length);
+    // Open the field form panel immediately so the engineer can fill every input.
+    setExpandedIndex(nextIndex);
   }
 
   function removeRow(index: number) {
@@ -224,9 +231,25 @@ export function SectionEditor({
           </div>
         )}
 
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={addRow}
+            className="min-h-12 w-full rounded-lg border-2 border-dashed border-amber-300 bg-amber-50 text-sm font-semibold text-amber-900 hover:border-amber-500 hover:bg-amber-100"
+          >
+            {addCtaLabel}
+          </button>
+        )}
+
         {rows.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
-            No rows yet. {!readOnly && "Tap \u201cAdd row\u201d to start."}
+            No entries yet.{" "}
+            {!readOnly && (
+              <>
+                Tap <span className="font-medium text-slate-700">{addCtaLabel}</span> to open the
+                form and fill every field.
+              </>
+            )}
           </div>
         ) : (
           <ul className="space-y-2">
@@ -239,6 +262,7 @@ export function SectionEditor({
                     type="button"
                     onClick={() => setExpandedIndex(expanded ? null : index)}
                     className="flex w-full min-h-14 items-center justify-between gap-3 px-4 py-3 text-left"
+                    aria-expanded={expanded}
                   >
                     <span className="min-w-0">
                       <span className="block truncate font-medium text-slate-900">{title}</span>
@@ -249,6 +273,10 @@ export function SectionEditor({
 
                   {expanded && (
                     <div className="border-t border-slate-100 px-4 py-4">
+                      <p className="mb-3 text-sm font-semibold text-slate-800">{addPanelTitle}</p>
+                      <p className="mb-4 text-xs text-slate-500">
+                        Complete each field below. Required fields are marked with *.
+                      </p>
                       <DynamicRowForm
                         fields={fields}
                         values={row}
@@ -272,7 +300,7 @@ export function SectionEditor({
                             onClick={() => removeRow(index)}
                             className="min-h-9 rounded-md border border-red-200 px-3 text-sm font-medium text-red-700 hover:bg-red-50"
                           >
-                            Remove row
+                            Remove
                           </button>
                         </div>
                       )}
@@ -282,16 +310,6 @@ export function SectionEditor({
               );
             })}
           </ul>
-        )}
-
-        {!readOnly && (
-          <button
-            type="button"
-            onClick={addRow}
-            className="min-h-12 w-full rounded-lg border-2 border-dashed border-slate-300 text-sm font-semibold text-slate-500 hover:border-amber-400 hover:text-amber-700"
-          >
-            + Add row
-          </button>
         )}
 
         <div className="pt-2">
