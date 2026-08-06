@@ -62,6 +62,12 @@ export default async function SiteHomePage({
             Machines (owned / on rent)
           </Link>
           <Link
+            href={`/tickets/new?siteId=${siteId}`}
+            className="mt-2 block min-h-11 rounded-md border border-slate-200 px-3 py-2 text-center text-sm font-medium text-slate-800 hover:bg-slate-50"
+          >
+            Raise ticket
+          </Link>
+          <Link
             href="/my/corrective-actions"
             className="mt-2 block min-h-11 rounded-md border border-slate-200 px-3 py-2 text-center text-sm font-medium text-amber-800 hover:bg-amber-50"
           >

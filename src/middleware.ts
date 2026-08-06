@@ -31,6 +31,8 @@ export const config = {
     "/my/:path*",
     "/machines",
     "/machines/:path*",
+    "/tickets",
+    "/tickets/:path*",
     "/api/((?!auth).*)",
   ],
 };

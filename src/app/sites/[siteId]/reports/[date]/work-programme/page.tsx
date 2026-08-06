@@ -21,7 +21,15 @@ export default async function WorkProgrammePage({
   if (!site) notFound();
 
   const report = await getOrCreateReport(siteId, date, user.id);
-  const { section, fields, rows } = await loadSectionData(siteId, report.id, "WORK_PROGRAMME");
+  const [{ section, fields, rows }, ticketOptions] = await Promise.all([
+    loadSectionData(siteId, report.id, "WORK_PROGRAMME"),
+    prisma.ticket.findMany({
+      where: { siteId, deletedAt: null, status: { not: "CLOSED" } },
+      select: { id: true, title: true, status: true },
+      orderBy: { updatedAt: "desc" },
+      take: 100,
+    }),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -39,6 +47,8 @@ export default async function WorkProgrammePage({
         initialStatus={section.status}
         standardShiftHours={Number(site.standardShiftHours)}
         backHref={`/sites/${siteId}/reports/${date}`}
+        siteId={siteId}
+        ticketOptions={ticketOptions}
       />
     </div>
   );

@@ -22,9 +22,9 @@ function normalizeValue(raw: unknown): unknown {
 export function flattenRow(
   row: RawRow,
   fields: ResolvedFieldDefinition[]
-): RowValues & { id: string; sortOrder: number } {
+): RowValues & { id: string; sortOrder: number; ticketId?: string | null } {
   const custom = (row.custom ?? {}) as Record<string, unknown>;
-  const out: RowValues & { id: string; sortOrder: number } = {
+  const out: RowValues & { id: string; sortOrder: number; ticketId?: string | null } = {
     id: row.id,
     sortOrder: row.sortOrder,
   };
@@ -32,6 +32,9 @@ export function flattenRow(
     out[f.key] = f.isSystem
       ? (normalizeValue(row[f.key]) as RowValues[string])
       : ((custom[f.key] ?? null) as RowValues[string]);
+  }
+  if ("ticketId" in row) {
+    out.ticketId = (row.ticketId as string | null | undefined) ?? null;
   }
   return out;
 }

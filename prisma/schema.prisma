@@ -100,6 +100,13 @@ enum Priority {
   CRITICAL
 }
 
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+  CLOSED
+}
+
 enum EmailStatus {
   QUEUED
   SENT
@@ -129,6 +136,10 @@ model User {
   actionsAssigned      CorrectiveAction[] @relation("ActionAssignedTo")
   actionsCreated       CorrectiveAction[] @relation("ActionCreatedBy")
   actionsClosed        CorrectiveAction[] @relation("ActionClosedBy")
+  ticketsRaised        Ticket[]           @relation("TicketRaisedBy")
+  ticketsClosed        Ticket[]           @relation("TicketClosedBy")
+  ticketAssignments    TicketAssignee[]
+  ticketDescriptionLogs TicketDescriptionLog[]
   auditLogs            AuditLog[]
 
   createdAt DateTime @default(now())
@@ -153,6 +164,7 @@ model Site {
   fieldDefinitions  FieldDefinition[]
   correctiveActions CorrectiveAction[]
   machines          Machine[]
+  tickets           Ticket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -258,10 +270,14 @@ model TaskRow {
   varianceReason         String?
   correctiveActionNote   String? // "Corrective Action (HO Guidance)" free text on the sheet
 
+  // Optional link from a daily DPR work row to a raised work-order ticket.
+  ticketId String?
+
   // Admin-defined extra fields, keyed by FieldDefinition.key.
   custom Json @default("{}")
 
   section           ReportSection      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  ticket            Ticket?            @relation(fields: [ticketId], references: [id], onDelete: SetNull)
   attachments       Attachment[]
   correctiveActions CorrectiveAction[]
 
@@ -269,6 +285,7 @@ model TaskRow {
   updatedAt DateTime @updatedAt
 
   @@index([sectionId, sortOrder])
+  @@index([ticketId])
 }
 
 // Report type 2 — DAILY LABOUR DEPLOYMENT & PRODUCTIVITY CONTROL
@@ -403,6 +420,66 @@ model CorrectiveAction {
   @@index([siteId, status])
   @@index([assignedToId, status])
   @@index([status, dueDate]) // backs the overdue query
+}
+
+// ---------------------------------------------------------------------------
+// Tickets (work orders — Jira-style, linkable to DPR TaskRows)
+// ---------------------------------------------------------------------------
+
+model Ticket {
+  id          String       @id @default(cuid())
+  siteId      String
+  title       String
+  description String?
+  status      TicketStatus @default(OPEN)
+
+  raisedById String
+  closedById String?
+  closedAt   DateTime?
+  // Soft delete — admin only. Null means active.
+  deletedAt  DateTime?
+
+  site        Site                   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  raisedBy    User                   @relation("TicketRaisedBy", fields: [raisedById], references: [id])
+  closedBy    User?                  @relation("TicketClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+  assignees   TicketAssignee[]
+  descriptionLogs TicketDescriptionLog[]
+  taskRows    TaskRow[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([siteId, status, deletedAt])
+  @@index([raisedById, deletedAt])
+  @@index([deletedAt, createdAt])
+}
+
+model TicketAssignee {
+  ticketId String
+  userId   String
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([ticketId, userId])
+  @@index([userId])
+}
+
+model TicketDescriptionLog {
+  id                   String  @id @default(cuid())
+  ticketId             String
+  changedById          String
+  previousDescription  String?
+  newDescription       String?
+
+  ticket    Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  changedBy User   @relation(fields: [changedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([ticketId, createdAt])
 }
 
 // ---------------------------------------------------------------------------

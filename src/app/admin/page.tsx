@@ -1,11 +1,15 @@
 import Link from "next/link";
+import { requireAdmin } from "@/lib/auth-guards";
 import { prisma } from "@/lib/prisma";
 import { todayInAppTimezone, startOfTodayInAppTimezone } from "@/lib/dates";
 import { getSiteDashboard } from "@/lib/dashboard";
 import { getDashboardInsights } from "@/lib/dashboardInsights";
 import { DashboardInsightsPanel } from "@/components/DashboardInsightsPanel";
+import { getOpenTicketsForHomepages } from "@/lib/tickets";
+import { TicketsHomePanel } from "@/components/tickets/TicketsHomePanel";
 
 export default async function AdminHomePage() {
+  const admin = await requireAdmin();
   const sites = await prisma.site.findMany({ where: { isActive: true }, orderBy: { name: "asc" } });
   const today = todayInAppTimezone();
   const startToday = startOfTodayInAppTimezone();
@@ -14,7 +18,7 @@ export default async function AdminHomePage() {
     where: { status: { not: "CLOSED" }, dueDate: { lt: startToday } },
   });
 
-  const [rows, insights] = await Promise.all([
+  const [rows, insights, openTickets] = await Promise.all([
     Promise.all(
       sites.map(async (site) => {
         const dash = await getSiteDashboard(site.id, today, today);
@@ -22,6 +26,7 @@ export default async function AdminHomePage() {
       }),
     ),
     getDashboardInsights("all"),
+    getOpenTicketsForHomepages({ userId: admin.id, role: admin.role, take: 8 }),
   ]);
 
   return (
@@ -35,6 +40,13 @@ export default async function AdminHomePage() {
           Overdue corrective actions: <strong>{overdueCount}</strong>
         </div>
       </div>
+
+      <TicketsHomePanel
+        tickets={openTickets}
+        raiseHref="/tickets/new"
+        listHref="/admin/tickets"
+        title="Open tickets"
+      />
 
       <DashboardInsightsPanel
         insights={insights}

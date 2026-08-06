@@ -6,7 +6,12 @@ import type { ResolvedFieldDefinition } from "@/lib/fields";
 import { DynamicRowForm, type RowValues } from "@/components/DynamicRowForm";
 import { StatusBadge } from "@/components/StatusBadge";
 
-type EditableRow = RowValues & { id?: string; sortOrder: number; _localKey: string };
+type EditableRow = RowValues & {
+  id?: string;
+  sortOrder: number;
+  ticketId?: string | null;
+  _localKey: string;
+};
 
 let localKeyCounter = 0;
 function nextLocalKey() {
@@ -68,15 +73,19 @@ export function SectionEditor({
   initialStatus,
   standardShiftHours,
   backHref,
+  siteId,
+  ticketOptions = [],
 }: {
   reportId: string;
   sectionType: "WORK_PROGRAMME" | "LABOUR_DEPLOYMENT";
   sectionLabel: string;
   fields: ResolvedFieldDefinition[];
-  initialRows: (RowValues & { id?: string; sortOrder?: number })[];
+  initialRows: (RowValues & { id?: string; sortOrder?: number; ticketId?: string | null })[];
   initialStatus: "DRAFT" | "SUBMITTED";
   standardShiftHours: number;
   backHref: string;
+  siteId?: string;
+  ticketOptions?: Array<{ id: string; title: string; status: string }>;
 }) {
   const [rows, setRows] = useState<EditableRow[]>(() => initialRows.map(toEditableRow));
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -293,6 +302,35 @@ export function SectionEditor({
                             : undefined
                         }
                       />
+                      {sectionType === "WORK_PROGRAMME" && siteId && (
+                        <label className="mt-4 block text-sm">
+                          <span className="mb-1 block font-medium text-slate-700">
+                            Link to ticket (work order)
+                          </span>
+                          <select
+                            value={row.ticketId ?? ""}
+                            disabled={readOnly}
+                            onChange={(e) =>
+                              updateRowField(index, "ticketId", e.target.value || null)
+                            }
+                            className="min-h-11 w-full rounded-md border px-3 disabled:bg-slate-50"
+                          >
+                            <option value="">— None —</option>
+                            {ticketOptions.map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.title} ({t.status.replaceAll("_", " ")})
+                              </option>
+                            ))}
+                            {row.ticketId &&
+                              !ticketOptions.some((t) => t.id === row.ticketId) && (
+                                <option value={row.ticketId}>Linked ticket (closed/other)</option>
+                              )}
+                          </select>
+                          <span className="mt-1 block text-xs text-slate-500">
+                            Connect this daily DPR task to a raised ticket for progress tracking.
+                          </span>
+                        </label>
+                      )}
                       {!readOnly && (
                         <div className="mt-4 flex justify-end">
                           <button

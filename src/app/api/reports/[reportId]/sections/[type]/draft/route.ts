@@ -79,6 +79,25 @@ export async function PUT(
     const incomingIds = new Set(incoming.filter((r) => r.id).map((r) => r.id as string));
     const idsToDelete = existingIds.filter((id) => !incomingIds.has(id));
 
+    if (type === "WORK_PROGRAMME") {
+      const ticketIds = [
+        ...new Set(
+          incoming
+            .map((r) => (r as RowValues & { ticketId?: string | null }).ticketId)
+            .filter((id): id is string => Boolean(id)),
+        ),
+      ];
+      if (ticketIds.length > 0) {
+        const valid = await prisma.ticket.findMany({
+          where: { id: { in: ticketIds }, siteId: report.siteId, deletedAt: null },
+          select: { id: true },
+        });
+        if (valid.length !== ticketIds.length) {
+          throw new HttpError(400, "Linked ticket is invalid for this site");
+        }
+      }
+    }
+
     const ops: Prisma.PrismaPromise<unknown>[] = [];
 
     incoming.forEach((row, index) => {
@@ -89,7 +108,16 @@ export async function PUT(
         const data = withDefaultPercentComplete(
           systemData as { targetQty?: number | null; achievedQty?: number | null; percentComplete?: number | null }
         );
-        const payload = { ...data, sortOrder, custom: customData } as Prisma.TaskRowUncheckedUpdateInput;
+        const ticketId =
+          "ticketId" in row
+            ? ((row as RowValues & { ticketId?: string | null }).ticketId || null)
+            : undefined;
+        const payload = {
+          ...data,
+          sortOrder,
+          custom: customData,
+          ...(ticketId !== undefined ? { ticketId } : {}),
+        } as Prisma.TaskRowUncheckedUpdateInput;
         if (row.id) {
           // Belt and braces on top of the foreignIds check above: scope the
           // update to this section so a row id can never cross sections.

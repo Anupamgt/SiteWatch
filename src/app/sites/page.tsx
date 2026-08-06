@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { parseDateOnly, todayInAppTimezone, formatDisplayDate } from "@/lib/dates";
 import { TopBar } from "@/components/TopBar";
 import { StatusBadge } from "@/components/StatusBadge";
+import { getOpenTicketsForHomepages } from "@/lib/tickets";
+import { TicketsHomePanel } from "@/components/tickets/TicketsHomePanel";
 
 export default async function SitesPage() {
   const user = await requireUser();
@@ -24,6 +26,13 @@ export default async function SitesPage() {
   });
   const reportBySite = new Map(todaysReports.map((r) => [r.siteId, r]));
 
+  const openTickets = await getOpenTicketsForHomepages({
+    userId: user.id,
+    role: user.role,
+    siteIds: sites.map((s) => s.id),
+    take: 6,
+  });
+
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar title="My Sites" userName={user.name ?? undefined} />
@@ -31,12 +40,22 @@ export default async function SitesPage() {
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm text-slate-500">Today — {formatDisplayDate(todayDate)}</p>
-          <Link
-            href="/machines"
-            className="text-sm font-medium text-amber-700 hover:underline"
-          >
-            Machines →
-          </Link>
+          <div className="flex gap-3 text-sm">
+            <Link href="/tickets" className="font-medium text-amber-700 hover:underline">
+              Tickets →
+            </Link>
+            <Link href="/machines" className="font-medium text-amber-700 hover:underline">
+              Machines →
+            </Link>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <TicketsHomePanel
+            tickets={openTickets}
+            raiseHref="/tickets/new"
+            listHref="/tickets"
+          />
         </div>
 
         {sites.length === 0 ? (
@@ -71,10 +90,10 @@ export default async function SitesPage() {
 
                     <div className="mt-3 flex gap-2">
                       <StatusBadge value={work?.status ?? "NOT_STARTED"} />
-                      <span className="text-xs text-slate-400 self-center">Work Programme</span>
+                      <span className="self-center text-xs text-slate-400">Work Programme</span>
                       <span className="mx-1 text-slate-300">·</span>
                       <StatusBadge value={labour?.status ?? "NOT_STARTED"} />
-                      <span className="text-xs text-slate-400 self-center">Labour</span>
+                      <span className="self-center text-xs text-slate-400">Labour</span>
                     </div>
                   </Link>
                 </li>
