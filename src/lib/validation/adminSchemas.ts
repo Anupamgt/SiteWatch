@@ -26,7 +26,7 @@ export const siteUpdateSchema = siteCreateSchema.partial().omit({ code: true }).
 export const userCreateSchema = z.object({
   email: z.string().trim().email().transform((v) => v.toLowerCase()),
   name: z.string().trim().min(1).max(120),
-  role: z.enum(["ENGINEER", "ADMIN"]),
+  role: z.enum(["ENGINEER", "SUPERVISOR", "ADMIN"]),
   phone: z.string().trim().max(40).optional().nullable(),
   password: z.string().min(6).max(128).optional(),
   isActive: z.boolean().optional(),
@@ -41,7 +41,7 @@ export const userUpdateSchema = z.object({
     .transform((v) => v.toLowerCase())
     .optional(),
   name: z.string().trim().min(1).max(120).optional(),
-  role: z.enum(["ENGINEER", "ADMIN"]).optional(),
+  role: z.enum(["ENGINEER", "SUPERVISOR", "ADMIN"]).optional(),
   phone: z.string().trim().max(40).optional().nullable(),
   password: z.string().min(6).max(128).optional().nullable(),
   isActive: z.boolean().optional(),

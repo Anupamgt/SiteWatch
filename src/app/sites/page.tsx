@@ -34,6 +34,7 @@ export default async function SitesPage() {
         {sites.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
             No sites assigned yet. Contact your administrator.
+            {user.role === "SUPERVISOR" ? " (Site supervisors cannot access People.)" : ""}
           </div>
         ) : (
           <ul className="space-y-3">

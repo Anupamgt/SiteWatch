@@ -15,8 +15,8 @@ export default async function AdminUsersPage() {
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">People</h1>
           <p className="text-sm text-slate-500">
-            Manage engineers and admins. Email/Gmail is the login identity for credentials and
-            Google Sign-In.
+            Manage engineers, site supervisors, and admins. Only admins can open this directory —
+            supervisors cannot view org people.
           </p>
         </div>
         <Link

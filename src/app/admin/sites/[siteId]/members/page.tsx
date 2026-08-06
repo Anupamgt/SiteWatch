@@ -11,13 +11,13 @@ export default async function SiteMembersPage({
   const site = await prisma.site.findUnique({ where: { id: siteId } });
   if (!site) notFound();
 
-  const [members, engineers] = await Promise.all([
+  const [members, candidates] = await Promise.all([
     prisma.siteMembership.findMany({
       where: { siteId },
       include: { user: { select: { id: true, name: true, email: true, role: true } } },
     }),
     prisma.user.findMany({
-      where: { isActive: true },
+      where: { isActive: true, role: { in: ["ENGINEER", "SUPERVISOR"] } },
       orderBy: { name: "asc" },
       select: { id: true, name: true, email: true, role: true },
     }),
@@ -29,7 +29,7 @@ export default async function SiteMembersPage({
       <MembersManager
         siteId={siteId}
         members={members.map((m) => m.user)}
-        candidates={engineers}
+        candidates={candidates}
       />
     </main>
   );

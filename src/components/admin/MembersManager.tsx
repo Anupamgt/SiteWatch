@@ -67,7 +67,7 @@ export function MembersManager({
             .filter((c) => !memberIds.has(c.id))
             .map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name} ({c.email})
+                {c.name} ({c.role}) — {c.email}
               </option>
             ))}
         </select>

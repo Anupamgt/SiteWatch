@@ -9,7 +9,7 @@ type Initial = {
   id: string;
   name: string;
   email: string;
-  role: "ENGINEER" | "ADMIN";
+  role: "ENGINEER" | "SUPERVISOR" | "ADMIN";
   phone: string | null;
   isActive: boolean;
   hasPassword: boolean;
@@ -29,6 +29,7 @@ export function PersonForm({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [siteIds, setSiteIds] = useState<string[]>(initial?.siteIds ?? []);
+  const [role, setRole] = useState(initial?.role ?? "ENGINEER");
 
   function toggleSite(id: string) {
     setSiteIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -43,10 +44,10 @@ export function PersonForm({
     const body: Record<string, unknown> = {
       name: String(fd.get("name") || ""),
       email: String(fd.get("email") || ""),
-      role: String(fd.get("role") || "ENGINEER"),
+      role,
       phone: String(fd.get("phone") || "") || null,
       isActive: fd.get("isActive") === "on",
-      siteIds,
+      siteIds: role === "ADMIN" ? [] : siteIds,
     };
     if (password) body.password = password;
 
@@ -87,12 +88,21 @@ export function PersonForm({
           <label className="mb-1 block text-sm font-medium">Role</label>
           <select
             name="role"
-            defaultValue={initial?.role ?? "ENGINEER"}
+            value={role}
+            onChange={(e) => setRole(e.target.value as Initial["role"])}
             className="min-h-11 w-full rounded-md border border-slate-300 px-3"
           >
-            <option value="ENGINEER">Engineer</option>
-            <option value="ADMIN">Admin</option>
+            <option value="ENGINEER">Site engineer</option>
+            <option value="SUPERVISOR">Site supervisor</option>
+            <option value="ADMIN">Admin (head office)</option>
           </select>
+          <p className="mt-1 text-xs text-slate-500">
+            {role === "SUPERVISOR"
+              ? "Supervisors can be assigned to multiple sites like engineers, but cannot access People / org directory."
+              : role === "ADMIN"
+                ? "Admins manage sites, people, and all reports. Site memberships are not required."
+                : "Engineers file daily work programme and labour for assigned sites only."}
+          </p>
         </div>
         <Field label="Phone" name="phone" defaultValue={initial?.phone ?? ""} />
         <div className="sm:col-span-2">
@@ -116,23 +126,25 @@ export function PersonForm({
         </div>
       </div>
 
-      <fieldset>
-        <legend className="mb-2 text-sm font-medium">Site memberships</legend>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {sites.map((s) => (
-            <label key={s.id} className="flex min-h-11 items-center gap-2 rounded-md border px-3">
-              <input
-                type="checkbox"
-                checked={siteIds.includes(s.id)}
-                onChange={() => toggleSite(s.id)}
-              />
-              <span className="text-sm">
-                {s.code} — {s.name}
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      {role !== "ADMIN" && (
+        <fieldset>
+          <legend className="mb-2 text-sm font-medium">Site memberships</legend>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {sites.map((s) => (
+              <label key={s.id} className="flex min-h-11 items-center gap-2 rounded-md border px-3">
+                <input
+                  type="checkbox"
+                  checked={siteIds.includes(s.id)}
+                  onChange={() => toggleSite(s.id)}
+                />
+                <span className="text-sm">
+                  {s.code} — {s.name}
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="isActive" defaultChecked={initial?.isActive ?? true} />

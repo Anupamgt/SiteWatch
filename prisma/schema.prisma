@@ -33,6 +33,7 @@ datasource db {
 
 enum Role {
   ENGINEER
+  SUPERVISOR
   ADMIN
 }
 

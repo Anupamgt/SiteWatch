@@ -24,7 +24,7 @@ export async function requireUser(): Promise<Session["user"]> {
   return session.user;
 }
 
-/** Session with role === "ADMIN" or throw 403. */
+/** Session with role === "ADMIN" or throw 403. People/org directory is admin-only. */
 export async function requireAdmin(): Promise<Session["user"]> {
   const user = await requireUser();
   if (user.role !== "ADMIN") {
@@ -33,9 +33,14 @@ export async function requireAdmin(): Promise<Session["user"]> {
   return user;
 }
 
+/** Site-scoped roles (engineer / supervisor) see only assigned sites. Admins bypass. */
+export function isSiteScopedRole(role: string): boolean {
+  return role === "ENGINEER" || role === "SUPERVISOR";
+}
+
 /**
  * Admins pass implicitly (they are not required to hold a SiteMembership row).
- * Engineers must have an active SiteMembership for the given site.
+ * Engineers and supervisors must have an active SiteMembership for the given site.
  * Every API route must call this itself — middleware is a convenience only.
  */
 export async function requireSiteAccess(siteId: string): Promise<Session["user"]> {

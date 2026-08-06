@@ -6,8 +6,8 @@ export default withAuth(
     const token = req.nextauth.token;
     const { pathname } = req.nextUrl;
 
-    // Engineers may not reach /admin/*. Send them to their home instead of a dead-end 403
-    // when a leftover callbackUrl=/admin is present after login.
+    // Engineers / supervisors may not reach /admin/* (People, org config).
+    // Send them to their site home instead of a dead-end 403.
     if (pathname.startsWith("/admin") && token?.role !== "ADMIN") {
       return NextResponse.redirect(new URL("/sites", req.url));
     }

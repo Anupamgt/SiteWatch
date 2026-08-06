@@ -36,6 +36,9 @@ export async function POST(
     }
     const user = await prisma.user.findUnique({ where: { id: parsed.data.userId } });
     if (!user) throw new HttpError(404, "User not found");
+    if (user.role !== "ENGINEER" && user.role !== "SUPERVISOR") {
+      throw new HttpError(400, "Only engineers and site supervisors can be site members");
+    }
 
     const membership = await prisma.siteMembership.upsert({
       where: { userId_siteId: { userId: parsed.data.userId, siteId } },
