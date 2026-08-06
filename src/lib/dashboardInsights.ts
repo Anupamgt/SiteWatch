@@ -40,11 +40,18 @@ export type DashboardInsights = {
 
 async function peopleOnSites(siteIds: string[] | "all") {
   const membershipWhere =
-    siteIds === "all" ? { user: { isActive: true } } : { siteId: { in: siteIds }, user: { isActive: true } };
+    siteIds === "all"
+      ? { user: { isActive: true } }
+      : { siteId: { in: siteIds }, user: { isActive: true } };
 
+  // Distinct users via membership — select only what the panel needs.
   const memberships = await prisma.siteMembership.findMany({
     where: membershipWhere,
-    include: { user: { select: { id: true, name: true, email: true, role: true, isActive: true } } },
+    distinct: ["userId"],
+    select: {
+      userId: true,
+      user: { select: { id: true, name: true, email: true, role: true, isActive: true } },
+    },
   });
 
   const engineers = new Map<string, NamedPerson>();
@@ -56,7 +63,10 @@ async function peopleOnSites(siteIds: string[] | "all") {
     if (m.user.role === "SUPERVISOR") supervisors.set(person.id, person);
   }
   return {
-    engineers: { total: engineers.size, names: [...engineers.values()].sort((a, b) => a.name.localeCompare(b.name)) },
+    engineers: {
+      total: engineers.size,
+      names: [...engineers.values()].sort((a, b) => a.name.localeCompare(b.name)),
+    },
     supervisors: {
       total: supervisors.size,
       names: [...supervisors.values()].sort((a, b) => a.name.localeCompare(b.name)),
@@ -66,30 +76,26 @@ async function peopleOnSites(siteIds: string[] | "all") {
 
 async function labourPresentOnDate(siteIds: string[] | "all", dateStr: string) {
   const reportDate = parseDateOnly(dateStr);
-  const reports = await prisma.report.findMany({
+  const rows = await prisma.labourRow.findMany({
     where: {
-      reportDate,
-      ...(siteIds === "all" ? {} : { siteId: { in: siteIds } }),
-    },
-    include: {
-      sections: {
-        where: { type: "LABOUR_DEPLOYMENT" },
-        include: { labourRows: true },
+      section: {
+        type: "LABOUR_DEPLOYMENT",
+        report: {
+          reportDate,
+          ...(siteIds === "all" ? {} : { siteId: { in: siteIds } }),
+        },
       },
     },
+    select: { labourCategory: true, actualPresent: true },
   });
 
   let total = 0;
   const byCat = new Map<string, number>();
-  for (const r of reports) {
-    for (const section of r.sections) {
-      for (const row of section.labourRows) {
-        const present = row.actualPresent ?? 0;
-        total += present;
-        const cat = row.labourCategory?.trim() || "Unspecified";
-        byCat.set(cat, (byCat.get(cat) ?? 0) + present);
-      }
-    }
+  for (const row of rows) {
+    const present = row.actualPresent ?? 0;
+    total += present;
+    const cat = row.labourCategory?.trim() || "Unspecified";
+    byCat.set(cat, (byCat.get(cat) ?? 0) + present);
   }
 
   return {
@@ -107,8 +113,21 @@ async function machinesForSites(siteIds: string[] | "all"): Promise<DashboardIns
       isActive: true,
       ...(siteIds === "all" ? {} : { siteId: { in: siteIds } }),
     },
-    include: { site: { select: { id: true, code: true, name: true } } },
+    select: {
+      id: true,
+      name: true,
+      category: true,
+      ownership: true,
+      status: true,
+      ownerLabel: true,
+      registration: true,
+      dailyRate: true,
+      notes: true,
+      siteId: true,
+      site: { select: { id: true, code: true, name: true } },
+    },
     orderBy: [{ ownership: "asc" }, { name: "asc" }],
+    take: 50,
   });
 
   const items: MachineSummaryRow[] = machines.map((m) => ({

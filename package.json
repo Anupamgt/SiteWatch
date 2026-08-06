@@ -15,7 +15,8 @@
     "db:studio": "prisma studio",
     "db:register-google": "tsx scripts/register-google-user.ts",
     "email:test": "tsx scripts/send-test-corrective-email.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "loadtest:25": "tsx scripts/load-test-25.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
