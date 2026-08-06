@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, errorResponseBody, HttpError } from "@/lib/auth-guards";
 import { getFieldDefinitions, getFieldDefinitionsForAdmin } from "@/lib/fields";
 import { fieldCreateSchema } from "@/lib/validation/adminSchemas";
+import { invalidateFieldDefsCache } from "@/lib/cache";
 
 export async function GET(
   req: NextRequest,
@@ -89,6 +90,7 @@ export async function POST(
       },
     });
 
+    await invalidateFieldDefsCache(siteId);
     return NextResponse.json({ field }, { status: 201 });
   } catch (err) {
     const { status, body } = errorResponseBody(err);

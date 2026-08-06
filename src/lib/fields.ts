@@ -1,5 +1,6 @@
 import type { FieldType, SectionType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { cached, fieldDefsCacheKey } from "@/lib/cache";
 
 export type ResolvedFieldDefinition = {
   id: string;
@@ -16,16 +17,7 @@ export type ResolvedFieldDefinition = {
   defaultValue: string | null;
 };
 
-/**
- * Effective field list for a site =
- *   site-specific rows  ∪  global rows whose key is not overridden,
- * filtered to active = true, sorted by order then key.
- *
- * This is the single source of truth for rendering, validation, and export
- * ordering. Every consumer (form renderer, API validator, Excel exporter)
- * must call this — never re-derive the merge logic inline.
- */
-export async function getFieldDefinitions(
+async function loadFieldDefinitions(
   siteId: string,
   sectionType: SectionType
 ): Promise<ResolvedFieldDefinition[]> {
@@ -57,6 +49,21 @@ export async function getFieldDefinitions(
       helpText: r.helpText,
       defaultValue: r.defaultValue,
     }));
+}
+
+/**
+ * Effective field list for a site =
+ *   site-specific rows  ∪  global rows whose key is not overridden,
+ * filtered to active = true, sorted by order then key.
+ *
+ * Cached in Redis (or memory) for 5 minutes — invalidate via
+ * `invalidateFieldDefsCache` after admin field edits.
+ */
+export async function getFieldDefinitions(
+  siteId: string,
+  sectionType: SectionType
+): Promise<ResolvedFieldDefinition[]> {
+  return cached(fieldDefsCacheKey(siteId, sectionType), () => loadFieldDefinitions(siteId, sectionType), 300);
 }
 
 export type AdminFieldDefinition = ResolvedFieldDefinition & {

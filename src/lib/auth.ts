@@ -9,10 +9,47 @@ import { checkLoginRateLimit, recordLoginFailure, recordLoginSuccess } from "@/l
 const googleConfigured =
   Boolean(process.env.GOOGLE_CLIENT_ID) && Boolean(process.env.GOOGLE_CLIENT_SECRET);
 
+const useSecureCookies =
+  (process.env.NEXTAUTH_URL ?? "").startsWith("https://") ||
+  process.env.NODE_ENV === "production";
+
+const cookiePrefix = useSecureCookies ? "__Secure-" : "";
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // refresh cookie at most once per day
+  },
+  useSecureCookies,
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+      },
+    },
+    callbackUrl: {
+      name: `${cookiePrefix}next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+      },
+    },
+    csrfToken: {
+      name: `${useSecureCookies ? "__Host-" : ""}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+      },
+    },
   },
   pages: {
     signIn: "/login",
@@ -34,23 +71,23 @@ export const authOptions: NextAuthOptions = {
           (req?.headers?.["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ||
           "unknown";
         const rateLimitKey = `${email}:${ip}`;
-        if (!checkLoginRateLimit(rateLimitKey)) {
+        if (!(await checkLoginRateLimit(rateLimitKey))) {
           throw new Error("Too many login attempts. Try again in a few minutes.");
         }
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || !user.isActive || !user.passwordHash) {
-          recordLoginFailure(rateLimitKey);
+          await recordLoginFailure(rateLimitKey);
           return null;
         }
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) {
-          recordLoginFailure(rateLimitKey);
+          await recordLoginFailure(rateLimitKey);
           return null;
         }
 
-        recordLoginSuccess(rateLimitKey);
+        await recordLoginSuccess(rateLimitKey);
         return {
           id: user.id,
           email: user.email,

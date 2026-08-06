@@ -54,6 +54,8 @@ Copy from `.env.production.example`. Minimum:
 | `GOOGLE_CLIENT_ID` | Same as local |
 | `GOOGLE_CLIENT_SECRET` | Same as local |
 | `EMAIL_PROVIDER` | `console` until Resend/SMTP is ready |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL (rate limit + cache) |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token |
 | `STORAGE_DRIVER` | `local` only if you accept no durable uploads; prefer `gcs` |
 | `APP_TIMEZONE` | `Asia/Kolkata` |
 

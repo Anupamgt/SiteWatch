@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, errorResponseBody, HttpError } from "@/lib/auth-guards";
 import { fieldUpdateSchema } from "@/lib/validation/adminSchemas";
+import { invalidateFieldDefsCache } from "@/lib/cache";
 
 export async function PATCH(
   req: NextRequest,
@@ -69,6 +70,7 @@ export async function PATCH(
       },
     });
 
+    await invalidateFieldDefsCache(siteId);
     return NextResponse.json({ field });
   } catch (err) {
     const { status, body } = errorResponseBody(err);
@@ -99,6 +101,7 @@ export async function DELETE(
         metadata: { key: existing.key, siteId },
       },
     });
+    await invalidateFieldDefsCache(siteId);
     return NextResponse.json({ ok: true });
   } catch (err) {
     const { status, body } = errorResponseBody(err);

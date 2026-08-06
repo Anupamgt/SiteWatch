@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin, errorResponseBody, HttpError } from "@/lib/auth-guards";
 import { getFieldDefinitionsForAdmin } from "@/lib/fields";
 import { fieldReorderSchema } from "@/lib/validation/adminSchemas";
+import { invalidateFieldDefsCache } from "@/lib/cache";
 
 export async function PATCH(
   req: NextRequest,
@@ -63,6 +64,7 @@ export async function PATCH(
       });
     });
 
+    await invalidateFieldDefsCache(siteId);
     const fields = await getFieldDefinitionsForAdmin(siteId, sectionType);
     return NextResponse.json({ fields });
   } catch (err) {

@@ -7,6 +7,32 @@ and export Excel workbooks matching `Baijnath+Nitish.xlsx`.
 One **Report** per site per calendar day holds a shared header and two independently drafted /
 submitted sections: **Work Programme** and **Labour Deployment**.
 
+## Redis cache + secure cookies
+
+### Cookies (NextAuth)
+
+Session cookies are configured in `src/lib/auth.ts`:
+- `httpOnly`, `sameSite=lax`
+- `__Secure-` / `__Host-` prefixes + `secure` when `NEXTAUTH_URL` is HTTPS (production)
+
+### Redis (Upstash)
+
+1. Create a free DB at [console.upstash.com](https://console.upstash.com)
+2. Copy **REST URL** + **REST TOKEN** into `.env` / Vercel:
+
+```bash
+UPSTASH_REDIS_REST_URL="https://….upstash.io"
+UPSTASH_REDIS_REST_TOKEN="…"
+```
+
+Used for:
+- Shared **login rate limiting** across Vercel instances
+- **Field-definition cache** (5 min TTL; invalidated on admin field edits)
+
+If unset, the app uses an in-memory fallback (fine for single-instance local/dev).
+
+Health check (admin session): `GET /api/admin/cache-health`
+
 ## Roles
 
 | Role | Access |
