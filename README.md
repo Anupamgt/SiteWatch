@@ -7,7 +7,15 @@ and export Excel workbooks matching `Baijnath+Nitish.xlsx`.
 One **Report** per site per calendar day holds a shared header and two independently drafted /
 submitted sections: **Work Programme** and **Labour Deployment**.
 
-## Stack
+## Roles
+
+| Role | Access |
+| --- | --- |
+| `ADMIN` | Full head-office: sites, people, dashboards, corrective actions |
+| `ENGINEER` | Assigned sites only — file work programme / labour reports |
+| `SUPERVISOR` | Assigned sites like engineers — **cannot** open People / org directory (`/admin/users`) |
+
+Create supervisors in **Admin → People** (role: Site supervisor) and assign site memberships.
 
 - Next.js (App Router) + TypeScript + Tailwind
 - PostgreSQL via Prisma **6.x** (pin required — Prisma 7 breaks this schema)
