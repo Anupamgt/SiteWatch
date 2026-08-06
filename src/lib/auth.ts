@@ -34,23 +34,23 @@ export const authOptions: NextAuthOptions = {
           (req?.headers?.["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ||
           "unknown";
         const rateLimitKey = `${email}:${ip}`;
-        if (!checkLoginRateLimit(rateLimitKey)) {
+        if (!(await checkLoginRateLimit(rateLimitKey))) {
           throw new Error("Too many login attempts. Try again in a few minutes.");
         }
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || !user.isActive || !user.passwordHash) {
-          recordLoginFailure(rateLimitKey);
+          await recordLoginFailure(rateLimitKey);
           return null;
         }
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) {
-          recordLoginFailure(rateLimitKey);
+          await recordLoginFailure(rateLimitKey);
           return null;
         }
 
-        recordLoginSuccess(rateLimitKey);
+        await recordLoginSuccess(rateLimitKey);
         return {
           id: user.id,
           email: user.email,
