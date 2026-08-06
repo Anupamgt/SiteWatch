@@ -46,3 +46,9 @@ next-env.d.ts
 
 # postgres data volume (docker-compose)
 .pgdata
+
+# Vercel import (secrets — never commit)
+.env.vercel
+.env.production
+.env.production.local
+.env.production.example.bak

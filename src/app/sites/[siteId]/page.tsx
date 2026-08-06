@@ -6,6 +6,8 @@ import { formatDateOnly, formatDisplayDate, todayInAppTimezone } from "@/lib/dat
 import { TopBar } from "@/components/TopBar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { GoToDateForm } from "@/components/GoToDateForm";
+import { getDashboardInsights } from "@/lib/dashboardInsights";
+import { DashboardInsightsPanel } from "@/components/DashboardInsightsPanel";
 
 export default async function SiteHomePage({
   params,
@@ -20,12 +22,15 @@ export default async function SiteHomePage({
 
   const today = todayInAppTimezone();
 
-  const recentReports = await prisma.report.findMany({
-    where: { siteId },
-    orderBy: { reportDate: "desc" },
-    take: 7,
-    include: { sections: true },
-  });
+  const [recentReports, insights] = await Promise.all([
+    prisma.report.findMany({
+      where: { siteId },
+      orderBy: { reportDate: "desc" },
+      take: 7,
+      include: { sections: true },
+    }),
+    getDashboardInsights([siteId]),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -41,12 +46,24 @@ export default async function SiteHomePage({
           </p>
         </section>
 
+        <DashboardInsightsPanel
+          insights={insights}
+          machinesHref={`/sites/${siteId}/machines`}
+          title="Workforce & machines"
+        />
+
         <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <h2 className="mb-3 text-sm font-semibold text-slate-700">Open a report</h2>
           <GoToDateForm siteId={siteId} defaultDate={today} />
           <Link
+            href={`/sites/${siteId}/machines`}
+            className="mt-3 block min-h-11 rounded-md border border-slate-200 px-3 py-2 text-center text-sm font-medium text-slate-800 hover:bg-slate-50"
+          >
+            Machines (owned / on rent)
+          </Link>
+          <Link
             href="/my/corrective-actions"
-            className="mt-3 block min-h-11 rounded-md border border-slate-200 px-3 py-2 text-center text-sm font-medium text-amber-800 hover:bg-amber-50"
+            className="mt-2 block min-h-11 rounded-md border border-slate-200 px-3 py-2 text-center text-sm font-medium text-amber-800 hover:bg-amber-50"
           >
             My corrective actions
           </Link>

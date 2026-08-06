@@ -59,6 +59,13 @@ export function todayInAppTimezone(): string {
   return formatInTimeZone(new Date(), APP_TIMEZONE, "yyyy-MM-dd");
 }
 
+/** Yesterday's calendar date (YYYY-MM-DD) in APP_TIMEZONE. */
+export function yesterdayInAppTimezone(): string {
+  const today = parseDateOnly(todayInAppTimezone());
+  const y = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - 1));
+  return formatDateOnly(y);
+}
+
 /** Start-of-today (date-only, UTC-midnight) in APP_TIMEZONE, for overdue comparisons. */
 export function startOfTodayInAppTimezone(): Date {
   return parseDateOnly(todayInAppTimezone());

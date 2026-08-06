@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { todayInAppTimezone, startOfTodayInAppTimezone } from "@/lib/dates";
 import { getSiteDashboard } from "@/lib/dashboard";
+import { getDashboardInsights } from "@/lib/dashboardInsights";
+import { DashboardInsightsPanel } from "@/components/DashboardInsightsPanel";
 
 export default async function AdminHomePage() {
   const sites = await prisma.site.findMany({ where: { isActive: true }, orderBy: { name: "asc" } });
@@ -12,12 +14,15 @@ export default async function AdminHomePage() {
     where: { status: { not: "CLOSED" }, dueDate: { lt: startToday } },
   });
 
-  const rows = await Promise.all(
-    sites.map(async (site) => {
-      const dash = await getSiteDashboard(site.id, today, today);
-      return { site, dash };
-    })
-  );
+  const [rows, insights] = await Promise.all([
+    Promise.all(
+      sites.map(async (site) => {
+        const dash = await getSiteDashboard(site.id, today, today);
+        return { site, dash };
+      }),
+    ),
+    getDashboardInsights("all"),
+  ]);
 
   return (
     <main className="space-y-6">
@@ -30,6 +35,12 @@ export default async function AdminHomePage() {
           Overdue corrective actions: <strong>{overdueCount}</strong>
         </div>
       </div>
+
+      <DashboardInsightsPanel
+        insights={insights}
+        machinesHref="/admin/machines"
+        title="Workforce & machines"
+      />
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full text-left text-sm">

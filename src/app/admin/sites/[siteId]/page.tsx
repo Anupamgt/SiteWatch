@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSiteDashboard } from "@/lib/dashboard";
+import { getDashboardInsights } from "@/lib/dashboardInsights";
+import { DashboardInsightsPanel } from "@/components/DashboardInsightsPanel";
 import { todayInAppTimezone, formatDisplayDate, parseDateOnly } from "@/lib/dates";
 import { StatusBadge } from "@/components/StatusBadge";
 import { subDays } from "date-fns";
@@ -23,7 +25,10 @@ export default async function SiteDashboardPage({
   const to = sp.to || todayInAppTimezone();
   const from =
     sp.from || formatInTimeZone(subDays(new Date(), 6), APP_TIMEZONE, "yyyy-MM-dd");
-  const dash = await getSiteDashboard(siteId, from, to);
+  const [dash, insights] = await Promise.all([
+    getSiteDashboard(siteId, from, to),
+    getDashboardInsights([siteId]),
+  ]);
   const pct = dash.tiles.avgPercentComplete;
 
   return (
@@ -43,6 +48,12 @@ export default async function SiteDashboardPage({
             Export Excel
           </a>
           <Link
+            href={`/admin/machines?siteId=${siteId}`}
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium"
+          >
+            Machines
+          </Link>
+          <Link
             href={`/admin/sites/${siteId}/fields`}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium"
           >
@@ -56,6 +67,12 @@ export default async function SiteDashboardPage({
           </Link>
         </div>
       </div>
+
+      <DashboardInsightsPanel
+        insights={insights}
+        machinesHref={`/admin/machines?siteId=${siteId}`}
+        title={`${site.code} · workforce & machines`}
+      />
 
       <form className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
         <div>

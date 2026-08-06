@@ -29,6 +29,8 @@ export const config = {
     "/sites/:path*",
     "/admin/:path*",
     "/my/:path*",
+    "/machines",
+    "/machines/:path*",
     "/api/((?!auth).*)",
   ],
 };

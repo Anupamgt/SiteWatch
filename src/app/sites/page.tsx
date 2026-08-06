@@ -29,7 +29,15 @@ export default async function SitesPage() {
       <TopBar title="My Sites" userName={user.name ?? undefined} />
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-5">
-        <p className="mb-4 text-sm text-slate-500">Today — {formatDisplayDate(todayDate)}</p>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-slate-500">Today — {formatDisplayDate(todayDate)}</p>
+          <Link
+            href="/machines"
+            className="text-sm font-medium text-amber-700 hover:underline"
+          >
+            Machines →
+          </Link>
+        </div>
 
         {sites.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">

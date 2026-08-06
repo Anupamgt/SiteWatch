@@ -37,6 +37,18 @@ enum Role {
   ADMIN
 }
 
+enum MachineOwnership {
+  OWNED
+  RENTED
+}
+
+enum MachineStatus {
+  ACTIVE
+  IDLE
+  UNDER_MAINTENANCE
+  OFFSITE
+}
+
 enum SectionType {
   WORK_PROGRAMME
   LABOUR_DEPLOYMENT
@@ -140,6 +152,7 @@ model Site {
   reports           Report[]
   fieldDefinitions  FieldDefinition[]
   correctiveActions CorrectiveAction[]
+  machines          Machine[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -390,6 +403,33 @@ model CorrectiveAction {
   @@index([siteId, status])
   @@index([assignedToId, status])
   @@index([status, dueDate]) // backs the overdue query
+}
+
+// ---------------------------------------------------------------------------
+// Machines (site fleet — owned / rented)
+// ---------------------------------------------------------------------------
+
+model Machine {
+  id           String           @id @default(cuid())
+  siteId       String
+  name         String
+  category     String? // Excavator, Crane, Mixer, ...
+  ownership    MachineOwnership @default(OWNED)
+  status       MachineStatus    @default(ACTIVE)
+  // For OWNED: internal asset tag / plate. For RENTED: rental vendor name.
+  ownerLabel   String?
+  registration String?
+  dailyRate    Decimal?         @db.Decimal(12, 2)
+  notes        String?
+  isActive     Boolean          @default(true)
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([siteId, isActive])
+  @@index([ownership, status])
 }
 
 // ---------------------------------------------------------------------------
