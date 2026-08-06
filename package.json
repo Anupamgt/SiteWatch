@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.mjs",
+    "start:single": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "db:migrate": "prisma migrate dev",

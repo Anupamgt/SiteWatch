@@ -428,3 +428,16 @@ model AuditLog {
   @@index([entityType, entityId])
   @@index([actorId, createdAt])
 }
+
+// One row per failed login attempt, keyed by "<email>:<ip>". Backs the login
+// rate limiter (lib/rateLimit.ts). This lives in the DB rather than process
+// memory so the limit is shared across all workers/instances — required once
+// the app runs on more than one process (clustered `npm start`, multiple Cloud
+// Run instances, etc.). See README.md / REMAINING_WORK.md §16.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
