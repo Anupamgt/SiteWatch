@@ -1,6 +1,7 @@
 import { getServerSession, type Session } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { cacheGet, cacheSet } from "@/lib/cache";
 
 /**
  * Thin, typed HTTP errors so route handlers can `catch` and map to a status
@@ -41,15 +42,24 @@ export function isSiteScopedRole(role: string): boolean {
 /**
  * Admins pass implicitly (they are not required to hold a SiteMembership row).
  * Engineers and supervisors must have an active SiteMembership for the given site.
- * Every API route must call this itself — middleware is a convenience only.
+ * Membership checks are cached briefly to keep submit/autosave snappy.
  */
 export async function requireSiteAccess(siteId: string): Promise<Session["user"]> {
   const user = await requireUser();
   if (user.role === "ADMIN") return user;
 
+  const cacheKey = `membership:${user.id}:${siteId}`;
+  const cached = await cacheGet<boolean>(cacheKey);
+  if (cached === true) return user;
+  if (cached === false) {
+    throw new HttpError(403, "You do not have access to this site");
+  }
+
   const membership = await prisma.siteMembership.findUnique({
     where: { userId_siteId: { userId: user.id, siteId } },
+    select: { id: true },
   });
+  await cacheSet(cacheKey, Boolean(membership), 120);
   if (!membership) {
     throw new HttpError(403, "You do not have access to this site");
   }

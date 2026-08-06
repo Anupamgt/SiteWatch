@@ -196,15 +196,28 @@ export function SectionEditor({
     setSubmitting(true);
     setErrorMessage(null);
     try {
-      // Flush any pending edits first so submit validates the latest data.
-      await saveDraft();
-      const res = await fetch(submitUrl, { method: "POST" });
+      // Cancel pending autosave — submit persists rows in the same request.
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+        debounceTimer.current = null;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const payloadRows = rowsRef.current.map(({ _localKey, ...rest }) => rest);
+      const res = await fetch(submitUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rows: payloadRows }),
+      });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Submission failed — check required fields");
       }
+      if (Array.isArray(data.rows)) {
+        setRows(data.rows.map(toEditableRow));
+      }
       setStatus("SUBMITTED");
       setConfirmingSubmit(false);
+      setSaveState("saved");
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : "Submission failed");
     } finally {
