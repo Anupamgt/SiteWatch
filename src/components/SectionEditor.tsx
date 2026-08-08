@@ -63,9 +63,17 @@ function rowSummary(
   const secondary = fields.find((f) => f.fieldType === "TEXTAREA") ?? fields[1];
   const titleVal = primary ? row[primary.key] : null;
   const subtitleVal = secondary ? row[secondary.key] : null;
+  let subtitle = "";
+  if (subtitleVal !== null && subtitleVal !== undefined && subtitleVal !== "") {
+    if (secondary?.key === "actualPresent" || secondary?.label === "Bus Number") {
+      subtitle = `${subtitleVal} on site`;
+    } else {
+      subtitle = String(subtitleVal);
+    }
+  }
   return {
     title: (titleVal as string) || untitledLabel,
-    subtitle: (subtitleVal as string) || "",
+    subtitle,
   };
 }
 
@@ -95,7 +103,7 @@ export function SectionEditor({
   const { t, ticketStatus } = useI18n();
   const [rows, setRows] = useState<EditableRow[]>(() => initialRows.map(toEditableRow));
   // Labour Deployment opens with the first pre-filled trade expanded so the
-  // engineer can enter a bus number immediately.
+  // engineer can enter the on-site labour count (Bus Number) immediately.
   const [expandedIndex, setExpandedIndex] = useState<number | null>(() =>
     sectionType === "LABOUR_DEPLOYMENT" && initialRows.length > 0 ? 0 : null,
   );
@@ -265,8 +273,8 @@ export function SectionEditor({
 
         {!readOnly && sectionType === "LABOUR_DEPLOYMENT" && (
           <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-            Labour types are pre-filled. Open a row, enter the bus number, then submit. Remove any
-            types not on site today.
+            Labour types are pre-filled. Open a row, enter the Bus Number (how many labour of that
+            type are on site), then submit. Remove any types not on site today.
           </p>
         )}
 
@@ -315,7 +323,7 @@ export function SectionEditor({
                       <p className="mb-3 text-sm font-semibold text-slate-800">{addPanelTitle}</p>
                       <p className="mb-4 text-xs text-slate-500">
                         {sectionType === "LABOUR_DEPLOYMENT"
-                          ? "Confirm labour type and enter the bus number. Required fields are marked with *."
+                          ? "Confirm labour type and enter Bus Number (count of labour on site). Required fields are marked with *."
                           : "Complete each field below. Required fields are marked with *."}
                       </p>
                       <DynamicRowForm

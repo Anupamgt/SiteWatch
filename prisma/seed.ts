@@ -125,8 +125,10 @@ const WORK_PROGRAMME_FIELDS: FieldSeed[] = [
   { key: "correctiveActionNote", label: "Corrective Action (HO Guidance)", fieldType: "TEXTAREA", order: 10 },
 ];
 
-// Simplified engineer labour form: Labour Type + Bus Number.
-// Other system columns remain in the template but inactive (admin can re-enable).
+// Simplified engineer labour form: Labour Type + Bus Number (headcount on site).
+// "Bus Number" is site jargon for how many labour of that type are present.
+// Stored in actualPresent so dashboards/exports keep working. Other system
+// columns remain in the template but inactive (admin can re-enable).
 const LABOUR_FIELDS: FieldSeed[] = [
   {
     key: "labourCategory",
@@ -146,35 +148,33 @@ const LABOUR_FIELDS: FieldSeed[] = [
     helpText: "Trade for this labour group (pre-filled from the site list).",
   },
   {
-    key: "busNumber",
+    key: "actualPresent",
     label: "Bus Number",
-    fieldType: "TEXT",
+    fieldType: "NUMBER",
     order: 1,
     isRequired: true,
-    isSystem: false,
-    placeholder: "e.g. BUS-12",
-    helpText: "Enter the bus number for this labour type.",
+    placeholder: "e.g. 12",
+    helpText: "Number of labour of this type present on site today.",
   },
   // Hidden from the simplified engineer form (kept for Excel / admin re-enable).
   { key: "contractorGangLeader", label: "Contractor / Gang Leader", fieldType: "TEXT", order: 2, isActive: false },
   { key: "plannedStaff", label: "Planned Staff", fieldType: "NUMBER", order: 3, isActive: false },
-  { key: "actualPresent", label: "Actual Present", fieldType: "NUMBER", order: 4, isActive: false },
-  { key: "otHours", label: "OT Hours", fieldType: "DECIMAL", order: 5, isActive: false },
+  { key: "otHours", label: "OT Hours", fieldType: "DECIMAL", order: 4, isActive: false },
   {
     key: "totalManHours",
     label: "Total Man-Hours",
     fieldType: "DECIMAL",
-    order: 6,
+    order: 5,
     isActive: false,
-    helpText: "Suggested from Actual Present × shift hours; edit to override.",
+    helpText: "Suggested from Bus Number × shift hours; edit to override.",
   },
-  { key: "assignedWorkArea", label: "Assigned Work Area", fieldType: "TEXT", order: 7, isActive: false },
-  { key: "outputDeliveredToday", label: "Output Delivered Today", fieldType: "TEXT", order: 8, isActive: false },
+  { key: "assignedWorkArea", label: "Assigned Work Area", fieldType: "TEXT", order: 6, isActive: false },
+  { key: "outputDeliveredToday", label: "Output Delivered Today", fieldType: "TEXT", order: 7, isActive: false },
   {
     key: "targetStdRate",
     label: "Target Std Rate",
     fieldType: "TEXT",
-    order: 9,
+    order: 8,
     isActive: false,
     placeholder: "20 SqM / Man-Day, N/A...",
   },
@@ -182,11 +182,21 @@ const LABOUR_FIELDS: FieldSeed[] = [
     key: "productivityCheck",
     label: "Productivity Check",
     fieldType: "SELECT",
-    order: 10,
+    order: 9,
     isActive: false,
     options: ["LOW", "NORMAL", "HIGH", "NOT_APPLICABLE"] satisfies ProductivityCheck[],
   },
-  { key: "supervisorRemarks", label: "Supervisor Remarks", fieldType: "TEXTAREA", order: 11, isActive: false },
+  { key: "supervisorRemarks", label: "Supervisor Remarks", fieldType: "TEXTAREA", order: 10, isActive: false },
+  // Previous mistaken vehicle-ID custom field — keep inactive if present.
+  {
+    key: "busNumber",
+    label: "Bus Number (legacy)",
+    fieldType: "TEXT",
+    order: 99,
+    isActive: false,
+    isSystem: false,
+    helpText: "Deprecated; use Bus Number (actualPresent) for labour headcount.",
+  },
 ];
 
 /**
@@ -511,8 +521,6 @@ async function seedSampleReport(
       targetStdRate: l.targetStdRate,
       productivityCheck: l.productivityCheck,
       supervisorRemarks: l.supervisorRemarks ?? null,
-      // Simplified form stores bus number in custom JSON.
-      custom: { busNumber: `BUS-${String(i + 1).padStart(2, "0")}` },
     };
     if (existing) {
       await prisma.labourRow.update({ where: { id: existing.id }, data });

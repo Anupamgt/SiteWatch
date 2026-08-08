@@ -51,7 +51,8 @@ export async function getOrCreateSection(reportId: string, type: SectionType) {
 
 /**
  * When an engineer first opens Labour Deployment on a DRAFT section with no
- * rows yet, seed one row per known labour type so they only enter bus numbers.
+ * rows yet, seed one row per known labour type so they only enter Bus Number
+ * (headcount on site) for each trade.
  */
 async function ensureDefaultLabourRows(sectionId: string, status: string) {
   if (status !== "DRAFT") return;
