@@ -489,10 +489,16 @@ export function SectionEditor({
                   onClick={addRow}
                   className="ads-btn ads-btn-subtle w-full justify-start font-medium text-[var(--ads-brand)] hover:text-[var(--ads-brand-hovered)]"
                 >
-                  <span aria-hidden className="text-lg leading-none">
-                    +
-                  </span>
-                  {addCtaLabel}
+                  {addCtaLabel.startsWith("+") ? (
+                    addCtaLabel
+                  ) : (
+                    <>
+                      <span aria-hidden className="text-lg leading-none">
+                        +
+                      </span>
+                      {addCtaLabel}
+                    </>
+                  )}
                 </button>
               </div>
             )}
