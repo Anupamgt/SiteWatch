@@ -21,14 +21,22 @@ async function seedUsers() {
   const engineerEmail = process.env.SEED_ENGINEER_EMAIL || "engineer@example.com";
   const engineerPassword = process.env.SEED_ENGINEER_PASSWORD || "engineer123";
 
+  // Re-seed restores demo credentials / roles so local + shared DBs don't drift
+  // into inactive/wrong-role states that break login.
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: {
+      name: "Admin",
+      passwordHash: await hash(adminPassword),
+      role: "ADMIN",
+      isActive: true,
+    },
     create: {
       email: adminEmail,
       name: "Admin",
       passwordHash: await hash(adminPassword),
       role: "ADMIN",
+      isActive: true,
     },
   });
 
@@ -36,12 +44,18 @@ async function seedUsers() {
   // engineer@example.com / engineer123 login requested for local dev/demo.
   const engineer = await prisma.user.upsert({
     where: { email: engineerEmail },
-    update: {},
+    update: {
+      name: "Baijnath",
+      passwordHash: await hash(engineerPassword),
+      role: "ENGINEER",
+      isActive: true,
+    },
     create: {
       email: engineerEmail,
       name: "Baijnath",
       passwordHash: await hash(engineerPassword),
       role: "ENGINEER",
+      isActive: true,
     },
   });
 
@@ -50,12 +64,18 @@ async function seedUsers() {
   const supervisorPassword = process.env.SEED_SUPERVISOR_PASSWORD || "nitish123";
   const supervisor = await prisma.user.upsert({
     where: { email: supervisorEmail },
-    update: {},
+    update: {
+      name: "Nitish",
+      passwordHash: await hash(supervisorPassword),
+      role: "ENGINEER",
+      isActive: true,
+    },
     create: {
       email: supervisorEmail,
       name: "Nitish",
       passwordHash: await hash(supervisorPassword),
       role: "ENGINEER",
+      isActive: true,
     },
   });
 
