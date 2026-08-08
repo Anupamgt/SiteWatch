@@ -31,8 +31,8 @@ export function LanguageSwitcher({
       className={
         className ??
         (compact
-          ? "inline-flex items-center gap-1 rounded-md bg-slate-800 p-0.5"
-          : "inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white p-0.5")
+          ? "inline-flex items-center gap-1 rounded-[var(--ads-radius)] bg-[#22272b] p-0.5"
+          : "inline-flex items-center gap-1 rounded-[var(--ads-radius)] border border-[var(--ads-border)] bg-[var(--ads-surface)] p-0.5")
       }
       role="group"
       aria-label={t("common.language")}
@@ -75,11 +75,15 @@ function LangBtn({
       onClick={onClick}
       className={
         compact
-          ? `rounded px-2 py-1 text-xs font-semibold transition ${
-              active ? "bg-amber-500 text-slate-900" : "text-slate-300 hover:text-white"
+          ? `rounded-[var(--ads-radius-sm)] px-2 py-1 text-xs font-semibold transition ${
+              active
+                ? "bg-[var(--ads-brand)] text-[var(--ads-text-inverse)]"
+                : "text-[#9fadbc] hover:text-white"
             }`
-          : `rounded px-3 py-1.5 text-sm font-medium transition ${
-              active ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-50"
+          : `rounded-[var(--ads-radius-sm)] px-3 py-1.5 text-sm font-medium transition ${
+              active
+                ? "bg-[var(--ads-brand)] text-[var(--ads-text-inverse)]"
+                : "text-[var(--ads-text-subtle)] hover:bg-[var(--ads-neutral)]"
             }`
       }
     >

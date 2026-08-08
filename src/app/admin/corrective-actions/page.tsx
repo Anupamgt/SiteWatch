@@ -33,16 +33,13 @@ export default async function CorrectiveActionsPage({
     <main className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Corrective actions</h1>
-        <Link
-          href="/admin/corrective-actions/new"
-          className="rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold"
-        >
+        <Link href="/admin/corrective-actions/new" className="ads-btn ads-btn-primary text-sm">
           New action
         </Link>
       </div>
 
-      <form className="flex flex-wrap gap-3 rounded-lg border bg-white p-3">
-        <select name="siteId" defaultValue={sp.siteId || ""} className="rounded-md border px-3 py-2 text-sm">
+      <form className="ads-surface flex flex-wrap gap-3 p-3">
+        <select name="siteId" defaultValue={sp.siteId || ""} className="ads-input py-2 text-sm">
           <option value="">All sites</option>
           {sites.map((s) => (
             <option key={s.id} value={s.id}>
@@ -50,7 +47,7 @@ export default async function CorrectiveActionsPage({
             </option>
           ))}
         </select>
-        <select name="status" defaultValue={sp.status || ""} className="rounded-md border px-3 py-2 text-sm">
+        <select name="status" defaultValue={sp.status || ""} className="ads-input py-2 text-sm">
           <option value="">All statuses</option>
           <option value="OPEN">Open</option>
           <option value="IN_PROGRESS">In progress</option>
@@ -60,22 +57,22 @@ export default async function CorrectiveActionsPage({
           <input type="checkbox" name="overdue" value="true" defaultChecked={sp.overdue === "true"} />
           Overdue only
         </label>
-        <button type="submit" className="rounded-md bg-slate-900 px-3 py-2 text-sm text-white">
+        <button type="submit" className="ads-btn ads-btn-primary text-sm">
           Filter
         </button>
       </form>
 
-      <div className="overflow-x-auto rounded-lg border bg-white">
-        <table className="min-w-full text-sm">
-          <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+      <div className="ads-table-wrap">
+        <table className="ads-table">
+          <thead>
             <tr>
-              <th className="px-3 py-2 text-left">Title</th>
-              <th className="px-3 py-2 text-left">Site</th>
-              <th className="px-3 py-2 text-left">Assignee</th>
-              <th className="px-3 py-2 text-left">Status</th>
-              <th className="px-3 py-2 text-left">Due</th>
-              <th className="px-3 py-2 text-left">Email</th>
-              <th className="px-3 py-2"></th>
+              <th>Title</th>
+              <th>Site</th>
+              <th>Assignee</th>
+              <th>Status</th>
+              <th>Due</th>
+              <th>Email</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -84,11 +81,11 @@ export default async function CorrectiveActionsPage({
                 a.status !== "CLOSED" && a.dueDate != null && a.dueDate.getTime() < today.getTime();
               const lastEmail = a.emails[0];
               return (
-                <tr key={a.id} className="border-t">
-                  <td className="px-3 py-2 font-medium">{a.title}</td>
-                  <td className="px-3 py-2">{a.site.code}</td>
-                  <td className="px-3 py-2">{a.assignedTo.name}</td>
-                  <td className="px-3 py-2">
+                <tr key={a.id}>
+                  <td className="font-medium">{a.title}</td>
+                  <td>{a.site.code}</td>
+                  <td>{a.assignedTo.name}</td>
+                  <td>
                     {overdue ? <StatusBadge value="OVERDUE" /> : <StatusBadge value={a.status} />}
                   </td>
                   <td className="px-3 py-2">{a.dueDate ? formatDateOnly(a.dueDate) : "—"}</td>

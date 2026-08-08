@@ -51,8 +51,8 @@ export default async function SiteMachinesPage({
       />
       <main className="mx-auto w-full max-w-4xl flex-1 space-y-4 px-4 py-5">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">Machines — {site.name}</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="ads-page-title">Machines — {site.name}</h1>
+          <p className="ads-page-subtitle">
             Mark each unit as owned by us or on rent. Changes save immediately for the site team.
           </p>
         </div>

@@ -7,17 +7,17 @@ export default async function LoginPage() {
   const { dict } = await getDictionary();
 
   return (
-    <div className="flex min-h-screen flex-1 items-center justify-center bg-slate-900 px-4 py-12">
-      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg sm:p-8">
+    <div className="flex min-h-screen flex-1 items-center justify-center bg-[var(--ads-surface-sunken)] px-4 py-12">
+      <div className="ads-surface w-full max-w-sm p-6 sm:p-8">
         <div className="mb-4 flex justify-end">
           <LanguageSwitcher />
         </div>
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500 text-xl font-bold text-slate-900">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-[var(--ads-radius)] bg-[var(--ads-brand-product)] text-xl font-bold text-[var(--ads-text)]">
             SW
           </div>
-          <h1 className="text-xl font-semibold text-slate-900">{dict.common.appName}</h1>
-          <p className="mt-1 text-sm leading-relaxed text-slate-500">{dict.login.subtitle}</p>
+          <h1 className="ads-page-title text-xl">{dict.common.appName}</h1>
+          <p className="ads-page-subtitle">{dict.login.subtitle}</p>
         </div>
 
         <Suspense fallback={null}>

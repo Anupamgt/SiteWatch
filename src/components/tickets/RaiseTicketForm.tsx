@@ -84,14 +84,14 @@ export function RaiseTicketForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+      className="ads-surface space-y-5 p-5"
     >
       <label className="block text-sm">
-        <span className="mb-1.5 block text-base font-medium text-slate-800">{t("tickets.site")}</span>
+        <span className="ads-label normal-case tracking-normal text-base">{t("tickets.site")}</span>
         <select
           value={siteId}
           onChange={(e) => setSiteId(e.target.value)}
-          className="min-h-12 w-full rounded-lg border border-slate-300 px-3 text-base"
+          className="ads-input min-h-12 text-base"
           required
         >
           {sites.map((s) => (
@@ -103,44 +103,44 @@ export function RaiseTicketForm({
       </label>
 
       <label className="block text-sm">
-        <span className="mb-1.5 block text-base font-medium text-slate-800">
-          {t("tickets.title")} <span className="text-red-600">*</span>
+        <span className="ads-label normal-case tracking-normal text-base">
+          {t("tickets.title")} <span className="text-[var(--ads-danger)]">*</span>
         </span>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="min-h-12 w-full rounded-lg border border-slate-300 px-3 text-base"
+          className="ads-input min-h-12 text-base"
           placeholder={t("tickets.titlePlaceholder")}
           required
         />
       </label>
 
       <label className="block text-sm">
-        <span className="mb-1.5 block text-base font-medium text-slate-800">
+        <span className="ads-label normal-case tracking-normal text-base">
           {t("tickets.description")}
         </span>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base"
+          className="ads-input py-2.5 text-base"
           placeholder={t("tickets.descriptionPlaceholder")}
         />
       </label>
 
       <fieldset>
-        <legend className="mb-1 text-base font-medium text-slate-800">
-          {t("tickets.assignees")} <span className="text-red-600">*</span>
+        <legend className="ads-label normal-case tracking-normal text-base">
+          {t("tickets.assignees")} <span className="text-[var(--ads-danger)]">*</span>
         </legend>
-        <p className="mb-2 text-sm text-slate-500">{t("tickets.assigneesHelp")}</p>
-        <div className="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-slate-200 p-2">
+        <p className="mb-2 text-sm text-[var(--ads-text-subtle)]">{t("tickets.assigneesHelp")}</p>
+        <div className="ads-list max-h-60 space-y-0 overflow-y-auto p-2">
           {users.length === 0 && (
             <p className="px-2 py-4 text-center text-sm text-slate-500">{t("tickets.noAssignees")}</p>
           )}
           {users.map((u) => (
             <label
               key={u.id}
-              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-slate-50"
+              className="flex cursor-pointer items-center gap-3 rounded-[var(--ads-radius)] px-3 py-2.5 hover:bg-[var(--ads-neutral)]"
             >
               <input
                 type="checkbox"
@@ -169,14 +169,14 @@ export function RaiseTicketForm({
         <button
           type="submit"
           disabled={saving}
-          className="min-h-12 flex-1 rounded-lg bg-amber-500 px-4 text-base font-semibold text-slate-900 disabled:opacity-60 sm:flex-none"
+          className="ads-btn ads-btn-primary min-h-12 flex-1 text-base sm:flex-none"
         >
           {saving ? t("tickets.raising") : t("tickets.raiseCta")}
         </button>
         <button
           type="button"
           onClick={() => router.push(cancelHref)}
-          className="min-h-12 rounded-lg border border-slate-300 px-4 text-base text-slate-700"
+          className="ads-btn ads-btn-default min-h-12 text-base"
         >
           {t("common.cancel")}
         </button>

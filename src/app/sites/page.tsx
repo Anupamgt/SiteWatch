@@ -41,14 +41,14 @@ export default async function SitesPage() {
 
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-[var(--ads-text-subtle)]">
             {dict.common.today} — {formatDisplayDate(todayDate)}
           </p>
           <div className="flex gap-3 text-sm">
-            <Link href="/tickets" className="font-medium text-amber-700 hover:underline">
+            <Link href="/tickets" className="ads-link">
               {dict.nav.tickets} →
             </Link>
-            <Link href="/machines" className="font-medium text-amber-700 hover:underline">
+            <Link href="/machines" className="ads-link">
               {dict.nav.machines} →
             </Link>
           </div>
@@ -63,7 +63,7 @@ export default async function SitesPage() {
         </div>
 
         {sites.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+          <div className="ads-empty p-8">
             {dict.common.noSites}
           </div>
         ) : (
@@ -77,7 +77,7 @@ export default async function SitesPage() {
                 <li key={site.id}>
                   <Link
                     href={`/sites/${site.id}`}
-                    className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm active:bg-slate-50"
+                    className="ads-surface block p-4 active:bg-[var(--ads-neutral)]"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -86,7 +86,7 @@ export default async function SitesPage() {
                           {site.code} · {site.projectName}
                         </p>
                       </div>
-                      <span className="shrink-0 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
+                      <span className="ads-chip shrink-0">
                         {site.code}
                       </span>
                     </div>

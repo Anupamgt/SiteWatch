@@ -19,40 +19,37 @@ export default async function AdminUsersPage() {
             supervisors cannot view org people.
           </p>
         </div>
-        <Link
-          href="/admin/users/new"
-          className="rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-amber-400"
-        >
+        <Link href="/admin/users/new" className="ads-btn ads-btn-primary text-sm">
           Add person
         </Link>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+      <div className="ads-table-wrap">
+        <table className="ads-table">
+          <thead>
             <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Email / Gmail</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Phone</th>
-              <th className="px-4 py-3">Sites</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3"></th>
+              <th>Name</th>
+              <th>Email / Gmail</th>
+              <th>Role</th>
+              <th>Phone</th>
+              <th>Sites</th>
+              <th>Status</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u.id} className="border-t border-slate-100">
-                <td className="px-4 py-3 font-medium">{u.name}</td>
-                <td className="px-4 py-3">{u.email}</td>
-                <td className="px-4 py-3">{u.role}</td>
-                <td className="px-4 py-3">{u.phone || "—"}</td>
-                <td className="px-4 py-3 text-slate-600">
+              <tr key={u.id}>
+                <td className="font-medium">{u.name}</td>
+                <td>{u.email}</td>
+                <td>{u.role}</td>
+                <td>{u.phone || "—"}</td>
+                <td className="text-[var(--ads-text-subtle)]">
                   {u.memberships.map((m) => m.site.code).join(", ") || "—"}
                 </td>
-                <td className="px-4 py-3">{u.isActive ? "Active" : "Inactive"}</td>
-                <td className="px-4 py-3 text-right">
-                  <Link href={`/admin/users/${u.id}`} className="text-amber-700 hover:underline">
+                <td>{u.isActive ? "Active" : "Inactive"}</td>
+                <td className="text-right">
+                  <Link href={`/admin/users/${u.id}`} className="ads-link">
                     Edit
                   </Link>
                 </td>

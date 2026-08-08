@@ -32,7 +32,7 @@ export function EngineerActionControls({
           type="button"
           disabled={busy}
           onClick={() => patch({ status: "IN_PROGRESS" })}
-          className="min-h-11 w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white"
+          className="ads-btn ads-btn-primary min-h-11 w-full text-sm"
         >
           Start work
         </button>
@@ -41,14 +41,14 @@ export function EngineerActionControls({
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Closure note / progress note"
-        className="w-full rounded-md border px-3 py-2 text-sm"
+        className="ads-input text-sm"
         rows={2}
       />
       <button
         type="button"
         disabled={busy || !note.trim()}
         onClick={() => patch({ closureNote: note, status: status === "OPEN" ? "IN_PROGRESS" : undefined })}
-        className="min-h-11 w-full rounded-md border border-slate-300 px-4 py-2 text-sm font-medium"
+        className="ads-btn ads-btn-default min-h-11 w-full text-sm"
       >
         Propose closure note
       </button>

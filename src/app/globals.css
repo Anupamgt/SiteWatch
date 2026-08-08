@@ -209,3 +209,136 @@ button {
   border-radius: var(--ads-radius);
   box-shadow: var(--ads-shadow-raised);
 }
+
+.ads-link {
+  color: var(--ads-brand);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ads-link:hover {
+  color: var(--ads-brand-hovered);
+  text-decoration: underline;
+}
+
+.ads-label {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ads-text-subtle);
+}
+
+.ads-page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ads-text);
+}
+
+.ads-page-subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--ads-text-subtle);
+}
+
+.ads-empty {
+  border: 1px dashed var(--ads-border-bold);
+  border-radius: var(--ads-radius);
+  background: var(--ads-surface);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--ads-text-subtle);
+}
+
+.ads-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--ads-border);
+  border-radius: var(--ads-radius);
+  background: var(--ads-surface);
+  box-shadow: var(--ads-shadow-raised);
+}
+
+.ads-table {
+  width: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.ads-table thead {
+  background: var(--ads-surface-sunken);
+  color: var(--ads-text-subtle);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ads-table th,
+.ads-table td {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--ads-border);
+  vertical-align: middle;
+}
+
+.ads-table thead th {
+  border-top: none;
+}
+
+.ads-table tbody tr:hover {
+  background: var(--ads-neutral);
+}
+
+.ads-list {
+  overflow: hidden;
+  border: 1px solid var(--ads-border);
+  border-radius: var(--ads-radius);
+  background: var(--ads-surface);
+  box-shadow: var(--ads-shadow-raised);
+}
+
+.ads-list > * + * {
+  border-top: 1px solid var(--ads-border);
+}
+
+.ads-list-row {
+  display: block;
+  padding: 0.875rem 1rem;
+  transition: background 120ms ease;
+}
+
+.ads-list-row:hover {
+  background: var(--ads-neutral);
+}
+
+.ads-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--ads-radius-sm);
+  background: var(--ads-neutral);
+  padding: 0.125rem 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ads-text-subtle);
+}
+
+.ads-nav-tab {
+  white-space: nowrap;
+  border-radius: var(--ads-radius);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ads-text-subtle);
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.ads-nav-tab:hover {
+  background: var(--ads-neutral);
+  color: var(--ads-text);
+}

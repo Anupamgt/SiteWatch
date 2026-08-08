@@ -13,7 +13,7 @@ export default async function SiteSettingsPage({
 
   return (
     <main className="mx-auto max-w-lg space-y-4">
-      <h1 className="text-2xl font-semibold">Site settings</h1>
+      <h1 className="ads-page-title text-2xl">Site settings</h1>
       <SiteSettingsForm
         site={{
           ...site,

@@ -19,7 +19,7 @@ export function ResendEmailButton({ id }: { id: string }) {
       type="button"
       onClick={resend}
       disabled={busy}
-      className="text-xs font-medium text-amber-700 hover:underline disabled:opacity-50"
+      className="ads-link text-xs disabled:opacity-50"
     >
       {msg || (busy ? "…" : "Resend")}
     </button>

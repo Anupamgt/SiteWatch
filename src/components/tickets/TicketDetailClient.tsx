@@ -130,7 +130,7 @@ export function TicketDetailClient({
     <div className="space-y-6">
       <form
         onSubmit={save}
-        className="space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+        className="ads-surface space-y-5 p-5"
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -141,7 +141,7 @@ export function TicketDetailClient({
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="mt-1 w-full border-b border-transparent text-xl font-semibold text-slate-900 focus:border-amber-400 focus:outline-none"
+                className="mt-1 w-full border-b border-transparent text-xl font-semibold text-[var(--ads-text)] focus:border-[var(--ads-border-focused)] focus:outline-none"
               />
             ) : (
               <h1 className="mt-1 text-xl font-semibold text-slate-900">{ticket.title}</h1>
@@ -158,7 +158,7 @@ export function TicketDetailClient({
             value={status}
             onChange={(e) => setStatus(e.target.value as typeof status)}
             disabled={!canEdit}
-            className="min-h-12 w-full rounded-lg border border-slate-300 px-3 text-base disabled:bg-slate-50"
+            className="ads-input min-h-12 text-base disabled:bg-[var(--ads-neutral)]"
           >
             {statusOptions.map((s) => (
               <option key={s} value={s}>
@@ -180,7 +180,7 @@ export function TicketDetailClient({
             onChange={(e) => setDescription(e.target.value)}
             rows={5}
             disabled={!canEdit}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base disabled:bg-slate-50"
+            className="ads-input py-2.5 text-base disabled:bg-[var(--ads-neutral)]"
           />
         </label>
 
@@ -189,7 +189,7 @@ export function TicketDetailClient({
             {t("tickets.assignees")}
           </legend>
           <p className="mb-2 text-sm text-slate-500">{t("tickets.assigneesHelp")}</p>
-          <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border p-2">
+          <div className="ads-list max-h-48 space-y-0 overflow-y-auto p-2">
             {assignableUsers.map((u) => (
               <label key={u.id} className="flex items-center gap-3 px-2 py-2">
                 <input
@@ -221,7 +221,7 @@ export function TicketDetailClient({
             <button
               type="submit"
               disabled={saving}
-              className="min-h-12 rounded-lg bg-slate-900 px-5 text-base font-medium text-white disabled:opacity-60"
+              className="ads-btn ads-btn-primary min-h-12 px-5 text-base"
             >
               {saving ? t("common.saving") : t("common.saveChanges")}
             </button>
@@ -229,7 +229,7 @@ export function TicketDetailClient({
               <button
                 type="button"
                 onClick={softDelete}
-                className="min-h-12 rounded-lg border border-red-200 px-4 text-base text-red-700"
+                className="ads-btn ads-btn-danger min-h-12 border border-[var(--ads-danger)] px-4 text-base"
               >
                 {t("tickets.remove")}
               </button>
@@ -241,15 +241,15 @@ export function TicketDetailClient({
       <section className="space-y-2">
         <h2 className="text-base font-semibold text-slate-800">{t("tickets.linkedTasks")}</h2>
         {ticket.taskRows.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm leading-relaxed text-slate-500">
+          <p className="ads-empty text-sm leading-relaxed">
             {t("tickets.linkedTasksEmpty")}
           </p>
         ) : (
-          <ul className="divide-y rounded-xl border border-slate-200 bg-white shadow-sm">
+          <ul className="ads-list">
             {ticket.taskRows.map((row) => {
               const date = row.section.report.reportDate;
               return (
-                <li key={row.id} className="px-4 py-3.5">
+                <li key={row.id} className="ads-list-row px-4 py-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <p className="text-base font-medium text-slate-900">
@@ -266,7 +266,7 @@ export function TicketDetailClient({
                     </div>
                     <Link
                       href={`/sites/${row.section.report.siteId}/reports/${date}/work-programme`}
-                      className="text-sm font-medium text-amber-700 hover:underline"
+                      className="ads-link text-sm"
                     >
                       {t("tickets.openDpr")} →
                     </Link>
@@ -287,7 +287,7 @@ export function TicketDetailClient({
             {ticket.descriptionLogs.map((log) => (
               <li
                 key={log.id}
-                className="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-relaxed"
+                className="ads-surface p-4 text-sm leading-relaxed"
               >
                 <p className="text-xs text-slate-500">
                   {log.changedBy.name} · {new Date(log.createdAt).toLocaleString()}
@@ -311,15 +311,13 @@ export function TicketDetailClient({
 
 function StatusPill({ label, status }: { label: string; status: string }) {
   const colors: Record<string, string> = {
-    OPEN: "bg-sky-50 text-sky-800",
-    IN_PROGRESS: "bg-amber-50 text-amber-900",
-    DONE: "bg-emerald-50 text-emerald-800",
-    CLOSED: "bg-slate-100 text-slate-600",
+    OPEN: "ads-lozenge bg-[#1d7afc14] text-[var(--ads-information)]",
+    IN_PROGRESS: "ads-lozenge bg-[#e5691014] text-[var(--ads-warning)]",
+    DONE: "ads-lozenge bg-[#22a06b14] text-[var(--ads-success-bold)]",
+    CLOSED: "ads-chip",
   };
   return (
-    <span
-      className={`rounded-full px-3 py-1 text-sm font-medium ${colors[status] ?? "bg-slate-100"}`}
-    >
+    <span className={`px-3 py-1 text-sm font-medium ${colors[status] ?? "ads-chip"}`}>
       {label}
     </span>
   );

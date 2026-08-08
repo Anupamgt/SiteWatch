@@ -35,10 +35,10 @@ export default async function AdminReportViewPage({
     <main className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">
+          <h1 className="ads-page-title text-2xl">
             {report.site.name} · {formatDisplayDate(report.reportDate)}
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="ads-page-subtitle">
             Engineer: {report.siteEngineerName || "—"} · Supervisor:{" "}
             {report.siteSupervisorName || "—"}
           </p>
@@ -46,11 +46,11 @@ export default async function AdminReportViewPage({
         <div className="flex flex-wrap gap-2">
           <a
             href={`/api/export/site/${siteId}?date=${formatDateOnly(report.reportDate)}`}
-            className="rounded-md border bg-white px-3 py-2 text-sm font-medium"
+            className="ads-btn ads-btn-default"
           >
             Export Excel
           </a>
-          <Link href={`/admin/sites/${siteId}`} className="rounded-md border bg-white px-3 py-2 text-sm">
+          <Link href={`/admin/sites/${siteId}`} className="ads-btn ads-btn-default">
             Dashboard
           </Link>
         </div>
@@ -64,15 +64,15 @@ export default async function AdminReportViewPage({
         labourStatus={labour?.status ?? null}
       />
 
-      <section className="rounded-lg border bg-white p-4">
-        <h2 className="mb-2 font-semibold">
+      <section className="ads-surface p-4">
+        <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-[var(--ads-text)]">
           Work Programme{" "}
           {work ? <StatusBadge value={work.status} /> : null}
         </h2>
-        <ul className="divide-y text-sm">
+        <ul className="divide-y divide-[var(--ads-border)] text-sm">
           {(work?.taskRows ?? []).map((t) => (
             <li key={t.id} className="flex justify-between gap-3 py-2">
-              <span>
+              <span className="text-[var(--ads-text)]">
                 {t.taskCode} — {t.plannedWorkDescription}
               </span>
               <StatusBadge value={t.status} />
@@ -81,16 +81,16 @@ export default async function AdminReportViewPage({
         </ul>
       </section>
 
-      <section className="rounded-lg border bg-white p-4">
-        <h2 className="mb-2 font-semibold">
+      <section className="ads-surface p-4">
+        <h2 className="mb-2 flex flex-wrap items-center gap-2 font-semibold text-[var(--ads-text)]">
           Labour{" "}
           {labour ? <StatusBadge value={labour.status} /> : null}
         </h2>
-        <ul className="divide-y text-sm">
+        <ul className="divide-y divide-[var(--ads-border)] text-sm">
           {(labour?.labourRows ?? []).map((l) => (
             <li key={l.id} className="flex justify-between gap-3 py-2">
-              <span>{l.labourCategory}</span>
-              <span className="text-slate-500">
+              <span className="text-[var(--ads-text)]">{l.labourCategory}</span>
+              <span className="text-[var(--ads-text-subtle)]">
                 {l.actualPresent}/{l.plannedStaff}
               </span>
             </li>

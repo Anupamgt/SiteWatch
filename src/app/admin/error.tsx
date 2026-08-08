@@ -8,10 +8,10 @@ export default function AdminError({
   reset: () => void;
 }) {
   return (
-    <div className="space-y-3 rounded-lg border border-red-200 bg-red-50 p-4">
-      <h2 className="font-semibold text-red-900">Admin error</h2>
-      <p className="text-sm text-red-800">{error.message}</p>
-      <button type="button" onClick={reset} className="rounded-md bg-red-800 px-3 py-2 text-sm text-white">
+    <div className="ads-flag ads-flag-error space-y-3 p-4">
+      <h2 className="font-semibold text-[var(--ads-danger-bold)]">Admin error</h2>
+      <p className="text-sm text-[var(--ads-danger)]">{error.message}</p>
+      <button type="button" onClick={reset} className="ads-btn ads-btn-primary bg-[var(--ads-danger-bold)]">
         Retry
       </button>
     </div>

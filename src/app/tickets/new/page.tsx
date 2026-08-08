@@ -32,7 +32,7 @@ export default async function NewTicketPage({
       <main className="mx-auto w-full max-w-xl flex-1 space-y-4 px-4 py-5">
         <p className="text-sm leading-relaxed text-slate-600">{dict.tickets.raiseHelp}</p>
         {sites.length === 0 ? (
-          <p className="rounded-xl border border-dashed p-6 text-center text-sm text-slate-500">
+          <p className="ads-empty">
             {dict.common.noSites}
           </p>
         ) : (

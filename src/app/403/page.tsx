@@ -12,7 +12,7 @@ export default function ForbiddenPage() {
       </p>
       <Link
         href="/"
-        className="mt-6 inline-flex min-h-11 items-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        className="ads-btn ads-btn-primary mt-6 min-h-11"
       >
         Back to home
       </Link>

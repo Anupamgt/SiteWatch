@@ -44,7 +44,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="email" className="ads-label">
             {t("login.email")}
           </label>
           <input
@@ -55,12 +55,12 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="min-h-12 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+            className="ads-input min-h-12 text-base"
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor="password" className="ads-label">
             {t("login.password")}
           </label>
           <input
@@ -71,12 +71,12 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="min-h-12 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+            className="ads-input min-h-12 text-base"
           />
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+          <p className="ads-flag ads-flag-error px-3 py-2 text-sm text-[var(--ads-danger)]" role="alert">
             {error}
           </p>
         )}
@@ -84,7 +84,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
         <button
           type="submit"
           disabled={loading}
-          className="min-h-12 w-full rounded-lg bg-amber-500 px-4 py-2 text-base font-semibold text-slate-900 transition-colors hover:bg-amber-400 disabled:opacity-60"
+          className="ads-btn ads-btn-primary min-h-12 w-full text-base"
         >
           {loading ? t("common.loading") : t("login.signIn")}
         </button>
@@ -92,13 +92,13 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
 
       {googleEnabled && (
         <>
-          <div className="relative py-1 text-center text-xs uppercase tracking-wide text-slate-400">
-            <span className="bg-white px-2">—</span>
+          <div className="relative py-1 text-center text-xs uppercase tracking-wide text-[var(--ads-text-subtlest)]">
+            <span className="bg-[var(--ads-surface)] px-2">—</span>
           </div>
           <button
             type="button"
             onClick={() => signIn("google", { callbackUrl: "/" })}
-            className="min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-base font-medium text-slate-800 hover:bg-slate-50"
+            className="ads-btn ads-btn-default min-h-12 w-full text-base"
           >
             {t("login.signInGoogle")}
           </button>
