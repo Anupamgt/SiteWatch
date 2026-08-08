@@ -22,7 +22,7 @@ export default async function EditUserPage({
 
   return (
     <main className="mx-auto max-w-2xl space-y-4">
-      <h1 className="text-2xl font-semibold">Edit person</h1>
+      <h1 className="ads-page-title text-2xl">Edit person</h1>
       <PersonForm
         mode="edit"
         sites={sites}

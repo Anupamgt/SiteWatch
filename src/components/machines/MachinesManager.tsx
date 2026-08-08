@@ -40,7 +40,7 @@ export function MachinesManager({
   const [showForm, setShowForm] = useState(false);
   const editing = useMemo(
     () => machines.find((m) => m.id === editingId) ?? null,
-    [machines, editingId]
+    [machines, editingId],
   );
 
   async function save(e: FormEvent<HTMLFormElement>) {
@@ -93,7 +93,7 @@ export function MachinesManager({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-[var(--ads-text-subtle)]">
           Track site machines as <strong>Owned by us</strong> or <strong>On rent</strong>. All roles
           with site access can view; edits respect your site permissions.
         </p>
@@ -104,7 +104,7 @@ export function MachinesManager({
               setEditingId(null);
               setShowForm(true);
             }}
-            className="rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900"
+            className="ads-btn ads-btn-primary text-sm"
           >
             + Add machine
           </button>
@@ -112,21 +112,18 @@ export function MachinesManager({
       </div>
 
       {(showForm || editing) && canEdit && (
-        <form
-          onSubmit={save}
-          className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
-        >
-          <h3 className="font-semibold text-slate-900">
+        <form onSubmit={save} className="ads-surface space-y-3 p-4">
+          <h3 className="font-semibold text-[var(--ads-text)]">
             {editing ? "Edit machine" : "New machine"}
           </h3>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
-              <span className="mb-1 block font-medium">Site</span>
+              <span className="ads-label normal-case tracking-normal">Site</span>
               <select
                 name="siteId"
                 required
                 defaultValue={editing?.siteId ?? defaultSiteId ?? sites[0]?.id}
-                className="min-h-11 w-full rounded-md border px-3"
+                className="ads-input min-h-11"
               >
                 {sites.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -136,41 +133,41 @@ export function MachinesManager({
               </select>
             </label>
             <label className="text-sm">
-              <span className="mb-1 block font-medium">Name *</span>
+              <span className="ads-label normal-case tracking-normal">Name *</span>
               <input
                 name="name"
                 required
                 defaultValue={editing?.name}
-                className="min-h-11 w-full rounded-md border px-3"
+                className="ads-input min-h-11"
                 placeholder="JCB 3DX"
               />
             </label>
             <label className="text-sm">
-              <span className="mb-1 block font-medium">Category</span>
+              <span className="ads-label normal-case tracking-normal">Category</span>
               <input
                 name="category"
                 defaultValue={editing?.category ?? ""}
-                className="min-h-11 w-full rounded-md border px-3"
+                className="ads-input min-h-11"
                 placeholder="Excavator, Crane, Mixer…"
               />
             </label>
             <label className="text-sm">
-              <span className="mb-1 block font-medium">Ownership</span>
+              <span className="ads-label normal-case tracking-normal">Ownership</span>
               <select
                 name="ownership"
                 defaultValue={editing?.ownership ?? "OWNED"}
-                className="min-h-11 w-full rounded-md border px-3"
+                className="ads-input min-h-11"
               >
                 <option value="OWNED">Owned by us</option>
                 <option value="RENTED">On rent</option>
               </select>
             </label>
             <label className="text-sm">
-              <span className="mb-1 block font-medium">Status</span>
+              <span className="ads-label normal-case tracking-normal">Status</span>
               <select
                 name="status"
                 defaultValue={editing?.status ?? "ACTIVE"}
-                className="min-h-11 w-full rounded-md border px-3"
+                className="ads-input min-h-11"
               >
                 {STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -180,39 +177,39 @@ export function MachinesManager({
               </select>
             </label>
             <label className="text-sm">
-              <span className="mb-1 block font-medium">Owner / rental vendor</span>
+              <span className="ads-label normal-case tracking-normal">Owner / rental vendor</span>
               <input
                 name="ownerLabel"
                 defaultValue={editing?.ownerLabel ?? ""}
-                className="min-h-11 w-full rounded-md border px-3"
+                className="ads-input min-h-11"
                 placeholder="Self / ABC Rentals"
               />
             </label>
             <label className="text-sm">
-              <span className="mb-1 block font-medium">Registration / asset no.</span>
+              <span className="ads-label normal-case tracking-normal">Registration / asset no.</span>
               <input
                 name="registration"
                 defaultValue={editing?.registration ?? ""}
-                className="min-h-11 w-full rounded-md border px-3"
+                className="ads-input min-h-11"
               />
             </label>
             <label className="text-sm">
-              <span className="mb-1 block font-medium">Daily rate (rent)</span>
+              <span className="ads-label normal-case tracking-normal">Daily rate (rent)</span>
               <input
                 name="dailyRate"
                 type="number"
                 step="0.01"
                 defaultValue={editing?.dailyRate ?? ""}
-                className="min-h-11 w-full rounded-md border px-3"
+                className="ads-input min-h-11"
               />
             </label>
             <label className="text-sm sm:col-span-2">
-              <span className="mb-1 block font-medium">Notes</span>
+              <span className="ads-label normal-case tracking-normal">Notes</span>
               <textarea
                 name="notes"
                 defaultValue={editing?.notes ?? ""}
                 rows={2}
-                className="w-full rounded-md border px-3 py-2"
+                className="ads-input py-2"
               />
             </label>
           </div>
@@ -220,12 +217,9 @@ export function MachinesManager({
             <input type="checkbox" name="isActive" defaultChecked={editing?.isActive ?? true} />
             Active
           </label>
-          {error && <p className="text-sm text-red-700">{error}</p>}
+          {error && <p className="text-sm text-[var(--ads-danger)]">{error}</p>}
           <div className="flex gap-2">
-            <button
-              type="submit"
-              className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-            >
+            <button type="submit" className="ads-btn ads-btn-primary text-sm">
               Save
             </button>
             <button
@@ -234,7 +228,7 @@ export function MachinesManager({
                 setShowForm(false);
                 setEditingId(null);
               }}
-              className="rounded-md border px-4 py-2 text-sm"
+              className="ads-btn ads-btn-default text-sm"
             >
               Cancel
             </button>
@@ -242,41 +236,45 @@ export function MachinesManager({
         </form>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+      <div className="ads-table-wrap">
+        <table className="ads-table">
+          <thead>
             <tr>
-              <th className="px-3 py-2">Machine</th>
-              <th className="px-3 py-2">Site</th>
-              <th className="px-3 py-2">Ownership</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2">Owner / vendor</th>
-              <th className="px-3 py-2">Rate</th>
-              {canEdit && <th className="px-3 py-2" />}
+              <th>Machine</th>
+              <th>Site</th>
+              <th>Ownership</th>
+              <th>Status</th>
+              <th>Owner / vendor</th>
+              <th>Rate</th>
+              {canEdit && <th />}
             </tr>
           </thead>
           <tbody>
             {machines.map((m) => (
-              <tr key={m.id} className="border-t border-slate-100">
-                <td className="px-3 py-2 font-medium">
+              <tr key={m.id}>
+                <td className="font-medium">
                   {m.name}
-                  {m.category ? <span className="text-slate-500"> · {m.category}</span> : null}
-                  {!m.isActive && <span className="ml-2 text-xs text-red-600">inactive</span>}
+                  {m.category ? (
+                    <span className="text-[var(--ads-text-subtle)]"> · {m.category}</span>
+                  ) : null}
+                  {!m.isActive && (
+                    <span className="ml-2 text-xs text-[var(--ads-danger)]">inactive</span>
+                  )}
                 </td>
-                <td className="px-3 py-2 text-slate-600">{m.site?.code ?? "—"}</td>
-                <td className="px-3 py-2">
+                <td className="text-[var(--ads-text-subtle)]">{m.site?.code ?? "—"}</td>
+                <td>
                   <OwnershipBadge ownership={m.ownership} />
                 </td>
-                <td className="px-3 py-2">{m.status.replaceAll("_", " ")}</td>
-                <td className="px-3 py-2 text-slate-600">{m.ownerLabel || "—"}</td>
-                <td className="px-3 py-2 text-slate-600">
+                <td>{m.status.replaceAll("_", " ")}</td>
+                <td className="text-[var(--ads-text-subtle)]">{m.ownerLabel || "—"}</td>
+                <td className="text-[var(--ads-text-subtle)]">
                   {m.dailyRate == null ? "—" : m.dailyRate.toLocaleString()}
                 </td>
                 {canEdit && (
-                  <td className="px-3 py-2 text-right space-x-2">
+                  <td className="space-x-2 text-right">
                     <button
                       type="button"
-                      className="text-amber-700 hover:underline"
+                      className="ads-link text-sm"
                       onClick={() => {
                         setEditingId(m.id);
                         setShowForm(true);
@@ -286,7 +284,7 @@ export function MachinesManager({
                     </button>
                     <button
                       type="button"
-                      className="text-red-600 hover:underline"
+                      className="ads-btn ads-btn-danger text-sm"
                       onClick={() => remove(m.id)}
                     >
                       Remove
@@ -297,7 +295,7 @@ export function MachinesManager({
             ))}
             {machines.length === 0 && (
               <tr>
-                <td colSpan={canEdit ? 7 : 6} className="px-3 py-6 text-center text-slate-500">
+                <td colSpan={canEdit ? 7 : 6} className="py-6 text-center text-[var(--ads-text-subtle)]">
                   No machines yet. {canEdit ? "Add one to get started." : ""}
                 </td>
               </tr>

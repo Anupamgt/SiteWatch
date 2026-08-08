@@ -26,21 +26,23 @@ export function DynamicField({
    * Attachments). Returns the persisted row id. */
   onRequireRowSave?: () => Promise<string | undefined>;
 }) {
-  const inputBaseClass =
-    "w-full min-h-11 rounded-md border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 " +
-    "focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:bg-slate-100 disabled:text-slate-500";
+  const inputBaseClass = "ads-input text-[15px]";
 
   const label = (
-    <label className="mb-1 flex items-baseline justify-between text-sm font-medium text-slate-700">
+    <label className="mb-1.5 flex items-baseline justify-between text-[0.75rem] font-semibold uppercase tracking-wide text-[var(--ads-text-subtle)]">
       <span>
         {field.label}
-        {field.isRequired && <span className="ml-0.5 text-amber-600">*</span>}
+        {field.isRequired && (
+          <span className="ml-0.5 text-[var(--ads-danger)]" aria-hidden>
+            *
+          </span>
+        )}
       </span>
     </label>
   );
 
   const help = field.helpText ? (
-    <p className="mt-1 text-xs text-slate-500">{field.helpText}</p>
+    <p className="mt-1.5 text-xs leading-relaxed text-[var(--ads-text-subtlest)]">{field.helpText}</p>
   ) : null;
 
   switch (field.fieldType) {
@@ -67,8 +69,9 @@ export function DynamicField({
           {label}
           <input
             type="number"
-            inputMode="decimal"
-            step="any"
+            inputMode={field.fieldType === "NUMBER" ? "numeric" : "decimal"}
+            step={field.fieldType === "NUMBER" ? "1" : "any"}
+            min={field.fieldType === "NUMBER" ? "0" : undefined}
             className={inputBaseClass}
             placeholder={field.placeholder ?? undefined}
             value={value === null || value === undefined ? "" : String(value)}
@@ -127,7 +130,7 @@ export function DynamicField({
           <input
             id={`field-${field.key}`}
             type="checkbox"
-            className="h-5 w-5 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+            className="h-5 w-5 rounded border-[var(--ads-border-bold)] text-[var(--ads-brand)] focus:ring-[var(--ads-border-focused)]"
             checked={Boolean(value)}
             disabled={disabled}
             onChange={(e) => onChange(e.target.checked)}
@@ -180,10 +183,10 @@ export function DynamicField({
                   key={opt}
                   disabled={disabled}
                   onClick={() => toggle(opt)}
-                  className={`min-h-9 rounded-full border px-3 py-1 text-sm ${
+                  className={`min-h-9 rounded-[var(--ads-radius)] border px-3 py-1 text-sm ${
                     active
-                      ? "border-amber-600 bg-amber-100 text-amber-900"
-                      : "border-slate-300 bg-white text-slate-600"
+                      ? "border-[var(--ads-brand)] bg-[#e9f2ff] text-[var(--ads-brand-hovered)]"
+                      : "border-[var(--ads-border-bold)] bg-[var(--ads-surface)] text-[var(--ads-text-subtle)]"
                   }`}
                 >
                   {opt}

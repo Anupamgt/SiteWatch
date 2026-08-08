@@ -54,9 +54,9 @@ export default async function MyMachinesPage() {
         <DashboardInsightsPanel insights={insights} title="Your sites · workforce & machines" />
 
         {sites.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500">
+          <p className="ads-empty text-sm">
             No sites assigned yet.{" "}
-            <Link href="/sites" className="text-amber-700 hover:underline">
+            <Link href="/sites" className="ads-link">
               Back to sites
             </Link>
           </p>

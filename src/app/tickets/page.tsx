@@ -68,7 +68,7 @@ export default async function TicketsListPage({
             )}
             <Link
               href="/tickets/new"
-              className="rounded-lg bg-amber-500 px-3 py-2 font-semibold text-slate-900"
+              className="ads-btn ads-btn-primary px-3 py-2 text-sm"
             >
               {dict.tickets.raise}
             </Link>

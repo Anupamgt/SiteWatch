@@ -44,20 +44,16 @@ export default async function AdminTicketsPage({
         </div>
         <Link
           href="/tickets/new"
-          className="rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-slate-900"
+          className="ads-btn ads-btn-primary px-4 py-2.5 text-sm"
         >
           {dict.tickets.raise}
         </Link>
       </div>
 
-      <form method="get" className="flex flex-wrap items-end gap-2 rounded-xl border bg-white p-3">
+      <form method="get" className="ads-surface flex flex-wrap items-end gap-2 p-3">
         <label className="text-sm">
-          <span className="mb-1 block text-xs text-slate-500">{dict.tickets.site}</span>
-          <select
-            name="siteId"
-            defaultValue={sp.siteId ?? ""}
-            className="min-h-11 rounded-lg border px-3"
-          >
+          <span className="ads-label normal-case tracking-normal">{dict.tickets.site}</span>
+          <select name="siteId" defaultValue={sp.siteId ?? ""} className="ads-input min-h-11">
             <option value="">{dict.common.all}</option>
             {sites.map((s) => (
               <option key={s.id} value={s.id}>
@@ -70,7 +66,7 @@ export default async function AdminTicketsPage({
           <input type="checkbox" name="includeClosed" value="1" defaultChecked={includeClosed} />
           {dict.tickets.showClosed}
         </label>
-        <button type="submit" className="min-h-11 rounded-lg bg-slate-900 px-4 text-sm text-white">
+        <button type="submit" className="ads-btn ads-btn-primary min-h-11 text-sm">
           {dict.common.apply}
         </button>
       </form>

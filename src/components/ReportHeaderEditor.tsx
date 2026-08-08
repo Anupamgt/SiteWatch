@@ -64,8 +64,8 @@ export function ReportHeaderEditor({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Edit header</p>
+    <form onSubmit={onSubmit} className="ads-surface space-y-3 p-4">
+      <p className="ads-label">Edit header</p>
       {(
         [
           ["siteEngineerName", "Site Engineer", values.siteEngineerName],
@@ -74,11 +74,11 @@ export function ReportHeaderEditor({
         ] as const
       ).map(([name, label, value]) => (
         <div key={name}>
-          <label className="mb-1 block text-xs text-slate-500">{label}</label>
+          <label className="ads-label">{label}</label>
           <input
             name={name}
             defaultValue={value}
-            className="min-h-11 w-full rounded-md border border-slate-300 px-3"
+            className="ads-input min-h-11"
           />
         </div>
       ))}
@@ -86,7 +86,7 @@ export function ReportHeaderEditor({
       <button
         type="submit"
         disabled={saving}
-        className="min-h-11 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+        className="ads-btn ads-btn-primary min-h-11"
       >
         {saving ? "Saving…" : "Save header"}
       </button>

@@ -18,16 +18,12 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-[var(--ads-surface-sunken)]">
       <TopBar title={`${dict.common.appName} · ${dict.nav.overview}`} userName={user.name ?? undefined} />
-      <nav className="border-b border-slate-200 bg-white">
+      <nav className="border-b border-[var(--ads-border)] bg-[var(--ads-surface)]">
         <div className="mx-auto flex w-full max-w-6xl gap-1 overflow-x-auto px-4 py-2">
           {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
-            >
+            <Link key={item.href} href={item.href} className="ads-nav-tab">
               {item.label}
             </Link>
           ))}

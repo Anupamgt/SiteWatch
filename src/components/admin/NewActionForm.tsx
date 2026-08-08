@@ -17,7 +17,7 @@ export function NewActionForm({
   const [error, setError] = useState<string | null>(null);
   const filtered = useMemo(
     () => engineers.filter((e) => e.siteIds.includes(siteId)),
-    [engineers, siteId]
+    [engineers, siteId],
   );
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -49,13 +49,13 @@ export function NewActionForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3 rounded-lg border bg-white p-5">
+    <form onSubmit={onSubmit} className="ads-surface space-y-3 p-5">
       <div>
-        <label className="mb-1 block text-sm font-medium">Site</label>
+        <label className="ads-label normal-case tracking-normal">Site</label>
         <select
           value={siteId}
           onChange={(e) => setSiteId(e.target.value)}
-          className="min-h-11 w-full rounded-md border px-3"
+          className="ads-input min-h-11"
           required
         >
           {sites.map((s) => (
@@ -66,8 +66,8 @@ export function NewActionForm({
         </select>
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium">Assign to</label>
-        <select name="assignedToId" required className="min-h-11 w-full rounded-md border px-3">
+        <label className="ads-label normal-case tracking-normal">Assign to</label>
+        <select name="assignedToId" required className="ads-input min-h-11">
           <option value="">Select engineer…</option>
           {filtered.map((e) => (
             <option key={e.id} value={e.id}>
@@ -77,17 +77,17 @@ export function NewActionForm({
         </select>
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium">Title</label>
-        <input name="title" required className="min-h-11 w-full rounded-md border px-3" />
+        <label className="ads-label normal-case tracking-normal">Title</label>
+        <input name="title" required className="ads-input min-h-11" />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium">HO guidance</label>
-        <textarea name="guidance" rows={3} className="w-full rounded-md border px-3 py-2" />
+        <label className="ads-label normal-case tracking-normal">HO guidance</label>
+        <textarea name="guidance" rows={3} className="ads-input py-2" />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium">Priority</label>
-          <select name="priority" defaultValue="MEDIUM" className="min-h-11 w-full rounded-md border px-3">
+          <label className="ads-label normal-case tracking-normal">Priority</label>
+          <select name="priority" defaultValue="MEDIUM" className="ads-input min-h-11">
             {["LOW", "MEDIUM", "HIGH", "CRITICAL"].map((p) => (
               <option key={p} value={p}>
                 {p}
@@ -96,18 +96,18 @@ export function NewActionForm({
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">Due date</label>
-          <input name="dueDate" type="date" className="min-h-11 w-full rounded-md border px-3" />
+          <label className="ads-label normal-case tracking-normal">Due date</label>
+          <input name="dueDate" type="date" className="ads-input min-h-11" />
         </div>
       </div>
       <input type="hidden" name="reportId" defaultValue={defaults.reportId} />
       <input type="hidden" name="taskRowId" defaultValue={defaults.taskRowId} />
       <div>
-        <label className="mb-1 block text-sm font-medium">Description</label>
-        <textarea name="description" rows={2} className="w-full rounded-md border px-3 py-2" />
+        <label className="ads-label normal-case tracking-normal">Description</label>
+        <textarea name="description" rows={2} className="ads-input py-2" />
       </div>
-      {error && <p className="text-sm text-red-700">{error}</p>}
-      <button type="submit" className="rounded-md bg-amber-500 px-4 py-2 font-semibold">
+      {error && <p className="text-sm text-[var(--ads-danger)]">{error}</p>}
+      <button type="submit" className="ads-btn ads-btn-primary">
         Create & email engineer
       </button>
     </form>

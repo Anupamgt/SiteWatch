@@ -35,34 +35,25 @@ export default async function SiteDashboardPage({
     <main className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{site.name}</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="ads-page-title text-2xl">{site.name}</h1>
+          <p className="ads-page-subtitle">
             {site.code} · {site.projectName}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <a
             href={`/api/export/site/${siteId}?from=${from}&to=${to}`}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium hover:bg-slate-50"
+            className="ads-btn ads-btn-default text-sm"
           >
             Export Excel
           </a>
-          <Link
-            href={`/admin/machines?siteId=${siteId}`}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium"
-          >
+          <Link href={`/admin/machines?siteId=${siteId}`} className="ads-btn ads-btn-default text-sm">
             Machines
           </Link>
-          <Link
-            href={`/admin/sites/${siteId}/fields`}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium"
-          >
+          <Link href={`/admin/sites/${siteId}/fields`} className="ads-btn ads-btn-default text-sm">
             Fields
           </Link>
-          <Link
-            href={`/admin/sites/${siteId}/settings`}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium"
-          >
+          <Link href={`/admin/sites/${siteId}/settings`} className="ads-btn ads-btn-default text-sm">
             Settings
           </Link>
         </div>
@@ -74,16 +65,16 @@ export default async function SiteDashboardPage({
         title={`${site.code} · workforce & machines`}
       />
 
-      <form className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
+      <form className="ads-surface flex flex-wrap items-end gap-3 p-4">
         <div>
-          <label className="mb-1 block text-xs text-slate-500">From</label>
-          <input type="date" name="from" defaultValue={from} className="rounded-md border px-3 py-2" />
+          <label className="ads-label normal-case tracking-normal">From</label>
+          <input type="date" name="from" defaultValue={from} className="ads-input py-2" />
         </div>
         <div>
-          <label className="mb-1 block text-xs text-slate-500">To</label>
-          <input type="date" name="to" defaultValue={to} className="rounded-md border px-3 py-2" />
+          <label className="ads-label normal-case tracking-normal">To</label>
+          <input type="date" name="to" defaultValue={to} className="ads-input py-2" />
         </div>
-        <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm text-white">
+        <button type="submit" className="ads-btn ads-btn-primary text-sm">
           Apply
         </button>
       </form>
@@ -114,38 +105,35 @@ export default async function SiteDashboardPage({
       </div>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-slate-700">Recent reports</h2>
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="min-w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+        <h2 className="text-sm font-semibold text-[var(--ads-text)]">Recent reports</h2>
+        <div className="ads-table-wrap">
+          <table className="ads-table">
+            <thead>
               <tr>
-                <th className="px-3 py-2 text-left">Date</th>
-                <th className="px-3 py-2 text-left">Engineer</th>
-                <th className="px-3 py-2 text-left">Work</th>
-                <th className="px-3 py-2 text-left">Labour</th>
-                <th className="px-3 py-2 text-left">Tasks</th>
-                <th className="px-3 py-2 text-left">Approved</th>
-                <th className="px-3 py-2"></th>
+                <th>Date</th>
+                <th>Engineer</th>
+                <th>Work</th>
+                <th>Labour</th>
+                <th>Tasks</th>
+                <th>Approved</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {dash.recentReports.map((r) => (
-                <tr key={r.id} className="border-t">
-                  <td className="px-3 py-2">{formatDisplayDate(parseDateOnly(r.date))}</td>
-                  <td className="px-3 py-2">{r.engineer || "—"}</td>
-                  <td className="px-3 py-2">
+                <tr key={r.id}>
+                  <td>{formatDisplayDate(parseDateOnly(r.date))}</td>
+                  <td>{r.engineer || "—"}</td>
+                  <td>
                     {r.workStatus ? <StatusBadge value={r.workStatus} /> : "—"}
                   </td>
-                  <td className="px-3 py-2">
+                  <td>
                     {r.labourStatus ? <StatusBadge value={r.labourStatus} /> : "—"}
                   </td>
-                  <td className="px-3 py-2">{r.taskCount}</td>
-                  <td className="px-3 py-2">{r.approved ? "Yes" : "No"}</td>
-                  <td className="px-3 py-2 text-right">
-                    <Link
-                      href={`/admin/sites/${siteId}/reports/${r.date}`}
-                      className="text-amber-700 hover:underline"
-                    >
+                  <td>{r.taskCount}</td>
+                  <td>{r.approved ? "Yes" : "No"}</td>
+                  <td className="text-right">
+                    <Link href={`/admin/sites/${siteId}/reports/${r.date}`} className="ads-link">
                       View
                     </Link>
                   </td>
@@ -158,24 +146,24 @@ export default async function SiteDashboardPage({
 
       <section className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-slate-700">Flagged tasks</h2>
-          <ul className="divide-y rounded-lg border border-slate-200 bg-white">
+          <h2 className="text-sm font-semibold text-[var(--ads-text)]">Flagged tasks</h2>
+          <ul className="ads-list">
             {dash.flaggedTasks.length === 0 && (
-              <li className="px-4 py-3 text-sm text-slate-500">None in range</li>
+              <li className="ads-list-row text-sm text-[var(--ads-text-subtle)]">None in range</li>
             )}
             {dash.flaggedTasks.map((t) => (
-              <li key={t.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+              <li key={t.id} className="ads-list-row flex items-center justify-between gap-3 text-sm">
                 <div>
                   <p className="font-medium">
                     {t.taskCode} · {t.description}
                   </p>
-                  <p className="text-slate-500">{t.date}</p>
+                  <p className="text-[var(--ads-text-subtle)]">{t.date}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <StatusBadge value={t.status} />
                   <Link
                     href={`/admin/corrective-actions/new?siteId=${siteId}&taskRowId=${t.id}&reportId=${t.reportId}`}
-                    className="text-xs font-medium text-amber-700 hover:underline"
+                    className="ads-link text-xs"
                   >
                     Raise action
                   </Link>
@@ -185,10 +173,10 @@ export default async function SiteDashboardPage({
           </ul>
         </div>
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-slate-700">Corrective actions</h2>
-          <ul className="divide-y rounded-lg border border-slate-200 bg-white">
+          <h2 className="text-sm font-semibold text-[var(--ads-text)]">Corrective actions</h2>
+          <ul className="ads-list">
             {dash.correctiveActions.slice(0, 10).map((a) => (
-              <li key={a.id} className="px-4 py-3 text-sm">
+              <li key={a.id} className="ads-list-row text-sm">
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-medium">{a.title}</p>
                   {a.overdue ? <StatusBadge value="OVERDUE" /> : <StatusBadge value={a.status} />}
@@ -207,9 +195,9 @@ export default async function SiteDashboardPage({
 
 function Tile({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-2 text-lg font-semibold text-slate-900">{value}</p>
+    <div className="ads-surface p-4">
+      <p className="ads-label normal-case tracking-normal">{title}</p>
+      <p className="mt-2 text-lg font-semibold text-[var(--ads-text)]">{value}</p>
     </div>
   );
 }

@@ -112,9 +112,11 @@ export function FieldConfigEditor({
 
   return (
     <div className="space-y-4">
-      {message && <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">{message}</p>}
+      {message && (
+        <p className="ads-flag px-3 py-2 text-sm text-[var(--ads-text)]">{message}</p>
+      )}
 
-      <ul className="divide-y rounded-lg border border-slate-200 bg-white">
+      <ul className="ads-list">
         {ordered.map((f) => (
           <li
             key={f.id + f.key}
@@ -129,7 +131,7 @@ export function FieldConfigEditor({
             </span>
             <div className="min-w-[10rem] flex-1">
               <input
-                className="w-full rounded border border-slate-200 px-2 py-1 text-sm font-medium"
+                className="ads-input py-1 text-sm font-medium"
                 defaultValue={f.label}
                 onBlur={(e) => {
                   if (e.target.value !== f.label) patchField(f.id, { label: e.target.value });
@@ -168,7 +170,7 @@ export function FieldConfigEditor({
         ))}
       </ul>
 
-      <form onSubmit={addCustom} className="space-y-3 rounded-lg border border-slate-200 bg-white p-4">
+      <form onSubmit={addCustom} className="ads-surface space-y-3 p-4">
         <h3 className="text-sm font-semibold">Add custom field</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           <input
@@ -176,19 +178,19 @@ export function FieldConfigEditor({
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             required
-            className="min-h-11 rounded-md border px-3"
+            className="ads-input min-h-11"
           />
           <input
             placeholder="camelCase key"
             value={newKey}
             onChange={(e) => setNewKey(e.target.value)}
             required
-            className="min-h-11 rounded-md border px-3"
+            className="ads-input min-h-11"
           />
           <select
             value={newType}
             onChange={(e) => setNewType(e.target.value)}
-            className="min-h-11 rounded-md border px-3"
+            className="ads-input min-h-11"
           >
             {["TEXT", "TEXTAREA", "NUMBER", "DECIMAL", "SELECT", "BOOLEAN", "PERCENT"].map((t) => (
               <option key={t} value={t}>
@@ -200,10 +202,10 @@ export function FieldConfigEditor({
             placeholder="Options (comma-separated for SELECT)"
             value={newOptions}
             onChange={(e) => setNewOptions(e.target.value)}
-            className="min-h-11 rounded-md border px-3"
+            className="ads-input min-h-11"
           />
         </div>
-        <button type="submit" className="rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold">
+        <button type="submit" className="ads-btn ads-btn-primary text-sm">
           Add field
         </button>
       </form>

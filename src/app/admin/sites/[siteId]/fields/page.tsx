@@ -23,25 +23,29 @@ export default async function SiteFieldsPage({
   return (
     <main className="space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold">Field configuration — {site.name}</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="ads-page-title text-2xl">Field configuration — {site.name}</h1>
+        <p className="ads-page-subtitle">
           System fields can be hidden/relabelled/reordered but not deleted.
         </p>
       </div>
       <div className="flex gap-2">
         <Link
           href={`/admin/sites/${siteId}/fields?section=WORK_PROGRAMME`}
-          className={`rounded-md px-3 py-2 text-sm ${
-            sectionType === "WORK_PROGRAMME" ? "bg-slate-900 text-white" : "bg-white border"
-          }`}
+          className={
+            sectionType === "WORK_PROGRAMME"
+              ? "ads-btn ads-btn-primary"
+              : "ads-btn ads-btn-default"
+          }
         >
           Work Programme
         </Link>
         <Link
           href={`/admin/sites/${siteId}/fields?section=LABOUR_DEPLOYMENT`}
-          className={`rounded-md px-3 py-2 text-sm ${
-            sectionType === "LABOUR_DEPLOYMENT" ? "bg-slate-900 text-white" : "bg-white border"
-          }`}
+          className={
+            sectionType === "LABOUR_DEPLOYMENT"
+              ? "ads-btn ads-btn-primary"
+              : "ads-btn ads-btn-default"
+          }
         >
           Labour Deployment
         </Link>

@@ -17,26 +17,28 @@ export function TopBar({
   const i18n = useI18nOptional();
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between bg-slate-900 px-4 py-3 text-white shadow-sm">
+    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-[#091e4224] bg-[#1d2125] px-4 py-2.5 text-white">
       <div className="flex min-w-0 items-center gap-3">
         {backHref ? (
           <Link
             href={backHref}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-lg text-slate-300 hover:bg-slate-800 hover:text-white"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] text-base text-[#c7d1db] hover:bg-[#ffffff14] hover:text-white"
             aria-label={i18n?.t("common.back") ?? "Back"}
           >
             ←
           </Link>
         ) : (
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-500 text-sm font-bold text-slate-900">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[3px] bg-[var(--ads-brand-product)] text-xs font-bold text-[#172b4d]">
             SW
           </div>
         )}
-        <h1 className="truncate text-base font-semibold">{title}</h1>
+        <h1 className="truncate text-[15px] font-semibold tracking-tight">{title}</h1>
       </div>
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <LanguageSwitcher compact />
-        {userName && <span className="hidden text-sm text-slate-300 sm:inline">{userName}</span>}
+        {userName && (
+          <span className="hidden text-sm text-[#9fadbc] sm:inline">{userName}</span>
+        )}
         <SignOutButton />
       </div>
     </header>

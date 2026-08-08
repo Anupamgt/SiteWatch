@@ -23,3 +23,14 @@ export const PRODUCTIVITY_LABELS: Record<string, string> = {
 };
 
 export const DEFAULT_STANDARD_SHIFT_HOURS = 8;
+
+/** Default labour trades shown as a pre-filled list on Labour Deployment. */
+export const LABOUR_TYPES = [
+  "Carpenter",
+  "Mason",
+  "Bar Bender",
+  "Welder",
+  "Gang Leader",
+  "Operator",
+  "Helper",
+] as const;

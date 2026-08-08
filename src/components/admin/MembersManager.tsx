@@ -36,7 +36,7 @@ export function MembersManager({
 
   return (
     <div className="space-y-4">
-      <ul className="divide-y rounded-lg border bg-white">
+      <ul className="ads-list">
         {members.map((m) => (
           <li key={m.id} className="flex items-center justify-between px-4 py-3 text-sm">
             <div>
@@ -60,7 +60,7 @@ export function MembersManager({
         <select
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-          className="min-h-11 min-w-[16rem] rounded-md border px-3"
+          className="ads-input min-h-11 min-w-[16rem]"
         >
           <option value="">Select person…</option>
           {candidates
@@ -74,7 +74,7 @@ export function MembersManager({
         <button
           type="button"
           onClick={add}
-          className="rounded-md bg-amber-500 px-4 py-2 text-sm font-semibold"
+          className="ads-btn ads-btn-primary text-sm"
         >
           Add member
         </button>

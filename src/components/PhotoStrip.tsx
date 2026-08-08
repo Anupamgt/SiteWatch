@@ -124,7 +124,7 @@ export function PhotoStrip({
       {(loading || visibleAttachments.length > 0) && (
         <div className="mb-2 flex flex-wrap gap-2">
           {visibleAttachments.map((a) => (
-            <div key={a.id} className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+            <div key={a.id} className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-[var(--ads-radius)] border border-[var(--ads-border)] bg-[var(--ads-neutral)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={a.url} alt={a.filename} className="h-full w-full object-cover" />
               {!disabled && (
@@ -156,7 +156,7 @@ export function PhotoStrip({
           />
           <label
             htmlFor={`photo-input-${taskRowId ?? "new"}`}
-            className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-md border border-dashed border-slate-300 px-4 text-sm font-medium text-slate-600 hover:border-amber-400 hover:text-amber-700"
+            className="ads-btn ads-btn-default inline-flex min-h-11 cursor-pointer items-center gap-2 border border-dashed border-[var(--ads-border-bold)]"
           >
             {uploading ? "Uploading…" : "📷 Add photo"}
           </label>

@@ -74,7 +74,7 @@ export function PersonForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <form onSubmit={onSubmit} className="ads-surface space-y-4 p-5">
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Name" name="name" defaultValue={initial?.name} required />
         <Field
@@ -85,12 +85,12 @@ export function PersonForm({
           required
         />
         <div>
-          <label className="mb-1 block text-sm font-medium">Role</label>
+          <label className="ads-label normal-case tracking-normal">Role</label>
           <select
             name="role"
             value={role}
             onChange={(e) => setRole(e.target.value as Initial["role"])}
-            className="min-h-11 w-full rounded-md border border-slate-300 px-3"
+            className="ads-input min-h-11"
           >
             <option value="ENGINEER">Site engineer</option>
             <option value="SUPERVISOR">Site supervisor</option>
@@ -118,7 +118,7 @@ export function PersonForm({
                 ? "Leave blank to keep current password"
                 : "Optional — leave blank for Google Sign-In only"
             }
-            className="min-h-11 w-full rounded-md border border-slate-300 px-3"
+            className="ads-input min-h-11"
           />
           <p className="mt-1 text-xs text-slate-500">
             Google Sign-In only works if this exact email already exists here and is active.
@@ -131,7 +131,7 @@ export function PersonForm({
           <legend className="mb-2 text-sm font-medium">Site memberships</legend>
           <div className="grid gap-2 sm:grid-cols-2">
             {sites.map((s) => (
-              <label key={s.id} className="flex min-h-11 items-center gap-2 rounded-md border px-3">
+              <label key={s.id} className="flex min-h-11 items-center gap-2 rounded-[var(--ads-radius)] border border-[var(--ads-border)] px-3">
                 <input
                   type="checkbox"
                   checked={siteIds.includes(s.id)}
@@ -157,7 +157,7 @@ export function PersonForm({
         <button
           type="submit"
           disabled={loading}
-          className="min-h-11 rounded-md bg-amber-500 px-4 py-2 font-semibold text-slate-900 disabled:opacity-60"
+          className="ads-btn ads-btn-primary min-h-11"
         >
           {loading ? "Saving…" : "Save"}
         </button>
@@ -165,7 +165,7 @@ export function PersonForm({
           <button
             type="button"
             onClick={deactivate}
-            className="min-h-11 rounded-md border border-red-300 px-4 py-2 text-red-700"
+            className="ads-btn ads-btn-danger min-h-11 border border-[var(--ads-danger)]"
           >
             Deactivate
           </button>
@@ -190,13 +190,13 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium">{label}</label>
+      <label className="ads-label normal-case tracking-normal">{label}</label>
       <input
         name={name}
         type={type}
         defaultValue={defaultValue}
         required={required}
-        className="min-h-11 w-full rounded-md border border-slate-300 px-3"
+        className="ads-input min-h-11"
       />
     </div>
   );

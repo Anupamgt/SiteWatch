@@ -18,7 +18,7 @@ export default async function NewCorrectiveActionPage({
 
   return (
     <main className="mx-auto max-w-xl space-y-4">
-      <h1 className="text-2xl font-semibold">Raise corrective action</h1>
+      <h1 className="ads-page-title text-2xl">Raise corrective action</h1>
       <NewActionForm
         sites={sites.map((s) => ({ id: s.id, code: s.code, name: s.name }))}
         engineers={engineers.map((e) => ({

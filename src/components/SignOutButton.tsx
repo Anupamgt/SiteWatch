@@ -9,7 +9,10 @@ export function SignOutButton({ className }: { className?: string }) {
     <button
       type="button"
       onClick={() => signOut({ callbackUrl: "/login" })}
-      className={className ?? "text-sm font-medium text-slate-300 hover:text-white"}
+      className={
+        className ??
+        "ads-btn ads-btn-subtle min-h-8 px-2 text-sm text-[#c7d1db] hover:bg-[#ffffff14] hover:text-white"
+      }
     >
       {i18n?.t("common.signOut") ?? "Sign out"}
     </button>

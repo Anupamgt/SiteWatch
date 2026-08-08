@@ -4,6 +4,7 @@ import { parseDateOnly, dayOfWeekFromDateOnly } from "@/lib/dates";
 import { HttpError } from "@/lib/auth-guards";
 import { getFieldDefinitions } from "@/lib/fields";
 import { flattenRow } from "@/lib/rows";
+import { LABOUR_TYPES } from "@/lib/constants";
 
 /**
  * Idempotent upsert on (siteId, reportDate). Header defaults are snapshotted
@@ -49,6 +50,32 @@ export async function getOrCreateSection(reportId: string, type: SectionType) {
 }
 
 /**
+ * When an engineer first opens Labour Deployment on a DRAFT section with no
+ * rows yet, seed one row per labour type from the field-definition options
+ * (DB template), falling back to LABOUR_TYPES. Engineer then only enters
+ * Bus Number (headcount on site) for each trade.
+ */
+async function ensureDefaultLabourRows(
+  sectionId: string,
+  status: string,
+  labourTypes: readonly string[],
+) {
+  if (status !== "DRAFT") return;
+  if (labourTypes.length === 0) return;
+
+  const existingCount = await prisma.labourRow.count({ where: { sectionId } });
+  if (existingCount > 0) return;
+
+  await prisma.labourRow.createMany({
+    data: labourTypes.map((labourCategory, sortOrder) => ({
+      sectionId,
+      sortOrder,
+      labourCategory,
+    })),
+  });
+}
+
+/**
  * Loads (and lazily creates) a section plus its resolved field definitions
  * and flattened rows. Shared by the section GET API route and the engineer
  * section pages so both stay in lockstep with `getFieldDefinitions`.
@@ -56,6 +83,13 @@ export async function getOrCreateSection(reportId: string, type: SectionType) {
 export async function loadSectionData(siteId: string, reportId: string, type: SectionType) {
   const section = await getOrCreateSection(reportId, type);
   const fields = await getFieldDefinitions(siteId, type);
+
+  if (type === "LABOUR_DEPLOYMENT") {
+    const categoryField = fields.find((f) => f.key === "labourCategory");
+    const fromDb = (categoryField?.options ?? []).map((o) => o.trim()).filter(Boolean);
+    const labourTypes = fromDb.length > 0 ? fromDb : [...LABOUR_TYPES];
+    await ensureDefaultLabourRows(section.id, section.status, labourTypes);
+  }
 
   const rows =
     type === "WORK_PROGRAMME"

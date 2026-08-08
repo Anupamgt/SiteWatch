@@ -22,11 +22,11 @@ export function DashboardInsightsPanel({
     <section className="space-y-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold text-slate-800">{heading}</h2>
-          <p className="mt-0.5 text-sm text-slate-500">{t("insights.help")}</p>
+          <h2 className="text-base font-semibold text-[var(--ads-text)]">{heading}</h2>
+          <p className="mt-0.5 text-sm text-[var(--ads-text-subtle)]">{t("insights.help")}</p>
         </div>
         {machinesHref && (
-          <Link href={machinesHref} className="text-sm font-medium text-amber-700 hover:underline">
+          <Link href={machinesHref} className="ads-link text-sm">
             {t("machines.manage")} →
           </Link>
         )}
@@ -71,26 +71,30 @@ export function DashboardInsightsPanel({
       </div>
 
       {insights.machines.items.length > 0 && (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+        <div className="ads-table-wrap">
+          <table className="ads-table">
+            <thead>
               <tr>
-                <th className="px-3 py-2">{t("machines.title")}</th>
-                <th className="px-3 py-2">Site</th>
-                <th className="px-3 py-2">{t("tickets.status")}</th>
-                <th className="px-3 py-2">{t("machines.owned")} / {t("machines.rented")}</th>
+                <th>{t("machines.title")}</th>
+                <th>Site</th>
+                <th>{t("tickets.status")}</th>
+                <th>
+                  {t("machines.owned")} / {t("machines.rented")}
+                </th>
               </tr>
             </thead>
             <tbody>
               {insights.machines.items.slice(0, 12).map((m) => (
-                <tr key={m.id} className="border-t border-slate-100">
-                  <td className="px-3 py-2.5 font-medium">
+                <tr key={m.id}>
+                  <td className="font-medium">
                     {m.name}
-                    {m.category ? <span className="text-slate-500"> · {m.category}</span> : null}
+                    {m.category ? (
+                      <span className="text-[var(--ads-text-subtle)]"> · {m.category}</span>
+                    ) : null}
                   </td>
-                  <td className="px-3 py-2.5 text-slate-600">{m.siteCode}</td>
-                  <td className="px-3 py-2.5 text-slate-600">{m.status.replaceAll("_", " ")}</td>
-                  <td className="px-3 py-2.5">
+                  <td className="text-[var(--ads-text-subtle)]">{m.siteCode}</td>
+                  <td className="text-[var(--ads-text-subtle)]">{m.status.replaceAll("_", " ")}</td>
+                  <td>
                     <OwnershipBadge ownership={m.ownership} />
                   </td>
                 </tr>
@@ -113,10 +117,10 @@ function InsightCard({
   detail: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{title}</p>
-      <p className="mt-2 text-lg font-semibold text-slate-900">{value}</p>
-      <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-slate-500">{detail}</p>
+    <div className="ads-surface p-4">
+      <p className="ads-label normal-case tracking-normal">{title}</p>
+      <p className="mt-2 text-lg font-semibold text-[var(--ads-text)]">{value}</p>
+      <p className="mt-1 line-clamp-3 text-sm leading-relaxed text-[var(--ads-text-subtle)]">{detail}</p>
     </div>
   );
 }
@@ -128,8 +132,8 @@ export function OwnershipBadge({ ownership }: { ownership: "OWNED" | "RENTED" })
     <span
       className={
         owned
-          ? "rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800"
-          : "rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800"
+          ? "ads-lozenge bg-[#22a06b14] text-[var(--ads-success-bold)]"
+          : "ads-lozenge bg-[#1d7afc14] text-[var(--ads-information)]"
       }
     >
       {owned ? t("machines.owned") : t("machines.rented")}

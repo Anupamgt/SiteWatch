@@ -27,12 +27,19 @@ export function DynamicRowForm({
   taskRowId?: string;
   onRequireRowSave?: () => Promise<string | undefined>;
 }) {
+  // Short forms (e.g. Labour Type + Bus Number) stay single-column for scanability.
+  const multiColumn = fields.length > 2;
+
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div className={`grid grid-cols-1 gap-4 ${multiColumn ? "sm:grid-cols-2" : ""}`}>
       {fields.map((field) => (
         <div
           key={field.key}
-          className={field.fieldType === "TEXTAREA" || field.fieldType === "PHOTO" ? "sm:col-span-2" : ""}
+          className={
+            multiColumn && (field.fieldType === "TEXTAREA" || field.fieldType === "PHOTO")
+              ? "sm:col-span-2"
+              : ""
+          }
         >
           <DynamicField
             field={field}

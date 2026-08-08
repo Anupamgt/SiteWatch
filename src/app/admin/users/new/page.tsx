@@ -10,7 +10,7 @@ export default async function NewUserPage() {
 
   return (
     <main className="mx-auto max-w-2xl space-y-4">
-      <h1 className="text-2xl font-semibold">Add person</h1>
+      <h1 className="ads-page-title text-2xl">Add person</h1>
       <PersonForm mode="create" sites={sites} />
     </main>
   );

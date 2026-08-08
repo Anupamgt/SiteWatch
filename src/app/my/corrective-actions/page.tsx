@@ -28,13 +28,13 @@ export default async function MyCorrectiveActionsPage() {
       <TopBar title="My corrective actions" userName={user.name ?? undefined} backHref="/sites" />
       <main className="mx-auto w-full max-w-2xl flex-1 space-y-3 px-4 py-5">
         {sorted.length === 0 && (
-          <p className="rounded-lg border bg-white p-4 text-sm text-slate-500">No actions assigned.</p>
+          <p className="ads-empty text-sm">No actions assigned.</p>
         )}
         {sorted.map((a) => {
           const overdue =
             a.status !== "CLOSED" && a.dueDate != null && a.dueDate.getTime() < today.getTime();
           return (
-            <article key={a.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+            <article key={a.id} className="ads-surface p-4">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <div>
                   <h2 className="font-semibold text-slate-900">{a.title}</h2>

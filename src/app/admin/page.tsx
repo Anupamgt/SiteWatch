@@ -33,10 +33,10 @@ export default async function AdminHomePage() {
     <main className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Portfolio overview</h1>
-          <p className="text-sm text-slate-500">Today&apos;s submission status across active sites.</p>
+          <h1 className="ads-page-title text-2xl">Portfolio overview</h1>
+          <p className="ads-page-subtitle">Today&apos;s submission status across active sites.</p>
         </div>
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
+        <div className="ads-flag ads-flag-error px-4 py-2 text-sm text-[var(--ads-danger)]">
           Overdue corrective actions: <strong>{overdueCount}</strong>
         </div>
       </div>
@@ -54,33 +54,28 @@ export default async function AdminHomePage() {
         title="Workforce & machines"
       />
 
-      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+      <div className="ads-table-wrap">
+        <table className="ads-table">
+          <thead>
             <tr>
-              <th className="px-4 py-3">Site</th>
-              <th className="px-4 py-3">Code</th>
-              <th className="px-4 py-3">Today submitted</th>
-              <th className="px-4 py-3">Open actions</th>
-              <th className="px-4 py-3">Overdue</th>
-              <th className="px-4 py-3"></th>
+              <th>Site</th>
+              <th>Code</th>
+              <th>Today submitted</th>
+              <th>Open actions</th>
+              <th>Overdue</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {rows.map(({ site, dash }) => (
-              <tr key={site.id} className="border-t border-slate-100">
-                <td className="px-4 py-3 font-medium text-slate-900">{site.name}</td>
-                <td className="px-4 py-3 text-slate-600">{site.code}</td>
-                <td className="px-4 py-3">
-                  {dash.tiles.reportsSubmitted}/{dash.tiles.reportsExpected}
-                </td>
+              <tr key={site.id}>
+                <td className="font-medium text-[var(--ads-text)]">{site.name}</td>
+                <td className="text-[var(--ads-text-subtle)]">{site.code}</td>
+                <td className="px-4 py-3">{dash.tiles.reportsSubmitted}/{dash.tiles.reportsExpected}</td>
                 <td className="px-4 py-3">{dash.tiles.openActions}</td>
-                <td className="px-4 py-3 text-red-700">{dash.tiles.overdueActions}</td>
-                <td className="px-4 py-3 text-right">
-                  <Link
-                    href={`/admin/sites/${site.id}`}
-                    className="font-medium text-amber-700 hover:underline"
-                  >
+                <td className="px-4 py-3 text-[var(--ads-danger)]">{dash.tiles.overdueActions}</td>
+                <td className="text-right">
+                  <Link href={`/admin/sites/${site.id}`} className="ads-link">
                     Dashboard →
                   </Link>
                 </td>

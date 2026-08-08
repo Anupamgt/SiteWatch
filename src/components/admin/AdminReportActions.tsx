@@ -32,11 +32,11 @@ export function AdminReportActions({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-white p-3 text-sm">
+    <div className="ads-surface flex flex-wrap items-center gap-2 p-3 text-sm">
       {approved ? (
-        <span className="text-green-700">Approved by {approvedBy || "HO"}</span>
+        <span className="text-[var(--ads-success-bold)]">Approved by {approvedBy || "HO"}</span>
       ) : (
-        <button type="button" onClick={approve} className="rounded-md bg-green-600 px-3 py-2 text-white">
+        <button type="button" onClick={approve} className="ads-btn ads-btn-primary px-3 py-2 text-sm">
           Approve report
         </button>
       )}
@@ -44,7 +44,7 @@ export function AdminReportActions({
         <button
           type="button"
           onClick={() => reopen("WORK_PROGRAMME")}
-          className="rounded-md border px-3 py-2"
+          className="ads-btn ads-btn-default px-3 py-2 text-sm"
         >
           Reopen work programme
         </button>
@@ -53,12 +53,12 @@ export function AdminReportActions({
         <button
           type="button"
           onClick={() => reopen("LABOUR_DEPLOYMENT")}
-          className="rounded-md border px-3 py-2"
+          className="ads-btn ads-btn-default px-3 py-2 text-sm"
         >
           Reopen labour
         </button>
       )}
-      {msg && <span className="text-slate-500">{msg}</span>}
+      {msg && <span className="text-[var(--ads-text-subtle)]">{msg}</span>}
     </div>
   );
 }

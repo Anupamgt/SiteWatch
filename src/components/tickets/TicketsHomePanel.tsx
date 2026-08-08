@@ -31,49 +31,39 @@ export function TicketsHomePanel({
     <section className="space-y-2">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold text-slate-800">{heading}</h2>
-          <p className="mt-0.5 text-sm text-slate-500">{t("tickets.openHelp")}</p>
+          <h2 className="text-base font-semibold text-[var(--ads-text)]">{heading}</h2>
+          <p className="mt-0.5 text-sm text-[var(--ads-text-subtle)]">{t("tickets.openHelp")}</p>
         </div>
         <div className="flex gap-3 text-sm">
-          <Link
-            href={raiseHref}
-            className="rounded-md bg-amber-500 px-3 py-1.5 font-semibold text-slate-900"
-          >
+          <Link href={raiseHref} className="ads-btn ads-btn-primary px-3 py-1.5 text-sm">
             {t("tickets.raise")}
           </Link>
-          <Link
-            href={listHref}
-            className="self-center font-medium text-slate-600 hover:underline"
-          >
+          <Link href={listHref} className="ads-link self-center">
             {t("tickets.viewAll")} →
           </Link>
         </div>
       </div>
 
       {tickets.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-5 text-center text-sm text-slate-500">
-          {t("tickets.empty")}
-        </p>
+        <p className="ads-empty">{t("tickets.empty")}</p>
       ) : (
-        <ul className="divide-y rounded-lg border border-slate-200 bg-white shadow-sm">
+        <ul className="ads-list">
           {tickets.map((item) => (
             <li key={item.id}>
               <Link
                 href={`/tickets/${item.id}`}
-                className="flex items-start justify-between gap-3 px-4 py-3.5 hover:bg-slate-50 active:bg-slate-100"
+                className="ads-list-row flex items-start justify-between gap-3 active:bg-[var(--ads-neutral-hovered)]"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-base font-medium text-slate-900">{item.title}</p>
-                  <p className="mt-0.5 text-sm text-slate-500">
+                  <p className="truncate text-base font-medium text-[var(--ads-text)]">{item.title}</p>
+                  <p className="mt-0.5 text-sm text-[var(--ads-text-subtle)]">
                     {item.site.code} · {t("tickets.raisedBy")} {item.raisedBy.name}
                     {item.assignees.length > 0
                       ? ` → ${item.assignees.map((a) => a.user.name).join(", ")}`
                       : ""}
                   </p>
                 </div>
-                <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-                  {ticketStatus(item.status)}
-                </span>
+                <span className="ads-chip shrink-0">{ticketStatus(item.status)}</span>
               </Link>
             </li>
           ))}

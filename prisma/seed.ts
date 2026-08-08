@@ -96,6 +96,8 @@ type FieldSeed = {
   fieldType: FieldType;
   order: number;
   isRequired?: boolean;
+  isActive?: boolean;
+  isSystem?: boolean;
   options?: string[];
   placeholder?: string;
   helpText?: string;
@@ -123,7 +125,10 @@ const WORK_PROGRAMME_FIELDS: FieldSeed[] = [
   { key: "correctiveActionNote", label: "Corrective Action (HO Guidance)", fieldType: "TEXTAREA", order: 10 },
 ];
 
-// Column order matches ARCHITECTURE.md §8.5 (A -> K).
+// Simplified engineer labour form: Labour Type + Bus Number (headcount on site).
+// "Bus Number" is site jargon for how many labour of that type are present.
+// Stored in actualPresent so dashboards/exports keep working. Other system
+// columns remain in the template but inactive (admin can re-enable).
 const LABOUR_FIELDS: FieldSeed[] = [
   {
     key: "labourCategory",
@@ -140,24 +145,58 @@ const LABOUR_FIELDS: FieldSeed[] = [
       "Operator",
       "Helper",
     ],
-    helpText: "Select the labour trade / type for this row.",
+    helpText: "Trade for this labour group (pre-filled from the site list).",
   },
-  { key: "contractorGangLeader", label: "Contractor / Gang Leader", fieldType: "TEXT", order: 1 },
-  { key: "plannedStaff", label: "Planned Staff", fieldType: "NUMBER", order: 2, isRequired: true },
-  { key: "actualPresent", label: "Actual Present", fieldType: "NUMBER", order: 3, isRequired: true },
-  { key: "otHours", label: "OT Hours", fieldType: "DECIMAL", order: 4 },
-  { key: "totalManHours", label: "Total Man-Hours", fieldType: "DECIMAL", order: 5, helpText: "Suggested from Actual Present × shift hours; edit to override." },
-  { key: "assignedWorkArea", label: "Assigned Work Area", fieldType: "TEXT", order: 6 },
-  { key: "outputDeliveredToday", label: "Output Delivered Today", fieldType: "TEXT", order: 7 },
-  { key: "targetStdRate", label: "Target Std Rate", fieldType: "TEXT", order: 8, placeholder: "20 SqM / Man-Day, N/A..." },
+  {
+    key: "actualPresent",
+    label: "Bus Number",
+    fieldType: "NUMBER",
+    order: 1,
+    isRequired: true,
+    placeholder: "e.g. 12",
+    helpText: "Number of labour of this type present on site today.",
+  },
+  // Hidden from the simplified engineer form (kept for Excel / admin re-enable).
+  { key: "contractorGangLeader", label: "Contractor / Gang Leader", fieldType: "TEXT", order: 2, isActive: false },
+  { key: "plannedStaff", label: "Planned Staff", fieldType: "NUMBER", order: 3, isActive: false },
+  { key: "otHours", label: "OT Hours", fieldType: "DECIMAL", order: 4, isActive: false },
+  {
+    key: "totalManHours",
+    label: "Total Man-Hours",
+    fieldType: "DECIMAL",
+    order: 5,
+    isActive: false,
+    helpText: "Suggested from Bus Number × shift hours; edit to override.",
+  },
+  { key: "assignedWorkArea", label: "Assigned Work Area", fieldType: "TEXT", order: 6, isActive: false },
+  { key: "outputDeliveredToday", label: "Output Delivered Today", fieldType: "TEXT", order: 7, isActive: false },
+  {
+    key: "targetStdRate",
+    label: "Target Std Rate",
+    fieldType: "TEXT",
+    order: 8,
+    isActive: false,
+    placeholder: "20 SqM / Man-Day, N/A...",
+  },
   {
     key: "productivityCheck",
     label: "Productivity Check",
     fieldType: "SELECT",
     order: 9,
+    isActive: false,
     options: ["LOW", "NORMAL", "HIGH", "NOT_APPLICABLE"] satisfies ProductivityCheck[],
   },
-  { key: "supervisorRemarks", label: "Supervisor Remarks", fieldType: "TEXTAREA", order: 10 },
+  { key: "supervisorRemarks", label: "Supervisor Remarks", fieldType: "TEXTAREA", order: 10, isActive: false },
+  // Previous mistaken vehicle-ID custom field — keep inactive if present.
+  {
+    key: "busNumber",
+    label: "Bus Number (legacy)",
+    fieldType: "TEXT",
+    order: 99,
+    isActive: false,
+    isSystem: false,
+    helpText: "Deprecated; use Bus Number (actualPresent) for labour headcount.",
+  },
 ];
 
 /**
@@ -182,6 +221,8 @@ async function seedFieldTemplate(sectionType: SectionType, fields: FieldSeed[]) 
       fieldType: f.fieldType,
       order: f.order,
       isRequired: f.isRequired ?? false,
+      isActive: f.isActive ?? true,
+      isSystem: f.isSystem ?? true,
       options: f.options ?? [],
       placeholder: f.placeholder ?? null,
       helpText: f.helpText ?? null,
@@ -191,7 +232,7 @@ async function seedFieldTemplate(sectionType: SectionType, fields: FieldSeed[]) 
       await prisma.fieldDefinition.update({ where: { id: existing.id }, data: sharedData });
     } else {
       await prisma.fieldDefinition.create({
-        data: { siteId: null, sectionType, key: f.key, isSystem: true, ...sharedData },
+        data: { siteId: null, sectionType, key: f.key, ...sharedData },
       });
     }
   }
@@ -558,6 +599,25 @@ async function main() {
 
   await seedFieldTemplate("WORK_PROGRAMME", WORK_PROGRAMME_FIELDS);
   await seedFieldTemplate("LABOUR_DEPLOYMENT", LABOUR_FIELDS);
+
+  // Site-level overrides win over the global template in getFieldDefinitions —
+  // keep their active/required flags aligned with the simplified labour form.
+  for (const f of LABOUR_FIELDS) {
+    await prisma.fieldDefinition.updateMany({
+      where: { sectionType: "LABOUR_DEPLOYMENT", key: f.key, siteId: { not: null } },
+      data: {
+        label: f.label,
+        fieldType: f.fieldType,
+        order: f.order,
+        isRequired: f.isRequired ?? false,
+        isActive: f.isActive ?? true,
+        isSystem: f.isSystem ?? true,
+        options: f.options ?? [],
+        placeholder: f.placeholder ?? null,
+        helpText: f.helpText ?? null,
+      },
+    });
+  }
 
   const { report } = await seedSampleReport(
     site.id,

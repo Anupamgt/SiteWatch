@@ -62,8 +62,8 @@ export default async function ReportHeaderPage({
       />
 
       <main className="mx-auto w-full max-w-2xl flex-1 space-y-5 px-4 py-5">
-        <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
+        <section className="ads-surface p-4">
+          <p className="ads-label mb-3">
             Report header
           </p>
           <dl className="grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
@@ -91,13 +91,13 @@ export default async function ReportHeaderPage({
           }}
         />
 
-        <section className="space-y-3">
-          <p className="text-sm font-semibold text-slate-700">Report sections</p>
+        <p className="text-sm font-semibold text-[var(--ads-text)]">Report sections</p>
+        <section className="ads-list space-y-0">
           {sections.map((s) => (
             <Link
               key={s.type}
               href={`/sites/${siteId}/reports/${date}/${s.type}`}
-              className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-sm active:bg-slate-50"
+              className="ads-list-row flex items-center justify-between"
             >
               <span className="text-base font-medium text-slate-900">{s.label}</span>
               <StatusBadge value={s.status} />
@@ -112,8 +112,8 @@ export default async function ReportHeaderPage({
 function HeaderField({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div>
-      <dt className="text-xs text-slate-400">{label}</dt>
-      <dd className="font-medium text-slate-800">{value || "—"}</dd>
+      <dt className="ads-label normal-case tracking-normal">{label}</dt>
+      <dd className="font-medium text-[var(--ads-text)]">{value || "—"}</dd>
     </div>
   );
 }

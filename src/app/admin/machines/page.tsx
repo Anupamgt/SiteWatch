@@ -44,10 +44,10 @@ export default async function AdminMachinesPage({
         </p>
       </div>
 
-      <form method="get" className="flex flex-wrap items-end gap-2 rounded-lg border border-slate-200 bg-white p-3">
+      <form method="get" className="ads-surface flex flex-wrap items-end gap-2 p-3">
         <label className="text-sm">
-          <span className="mb-1 block text-xs text-slate-500">Filter by site</span>
-          <select name="siteId" defaultValue={sp.siteId ?? ""} className="min-h-10 rounded-md border px-3">
+          <span className="ads-label normal-case tracking-normal">Filter by site</span>
+          <select name="siteId" defaultValue={sp.siteId ?? ""} className="ads-input min-h-10">
             <option value="">All sites</option>
             {sites.map((s) => (
               <option key={s.id} value={s.id}>
@@ -56,11 +56,11 @@ export default async function AdminMachinesPage({
             ))}
           </select>
         </label>
-        <button type="submit" className="rounded-md bg-slate-900 px-4 py-2 text-sm text-white">
+        <button type="submit" className="ads-btn ads-btn-primary text-sm">
           Apply
         </button>
         {sp.siteId && (
-          <Link href="/admin/machines" className="text-sm text-amber-700 hover:underline">
+          <Link href="/admin/machines" className="ads-link text-sm">
             Clear
           </Link>
         )}

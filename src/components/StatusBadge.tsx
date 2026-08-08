@@ -1,39 +1,38 @@
 /**
  * Single shared status-color mapping so badge colours never drift between
  * the engineer UI, the admin dashboard, and (later) the Excel export notes.
+ * Styled as Atlassian Design System lozenges.
  * See ARCHITECTURE.md §6.
  */
 const COLOR_MAP: Record<string, string> = {
-  COMPLETED: "bg-green-100 text-green-800",
-  CLOSED: "bg-green-100 text-green-800",
-  SUBMITTED: "bg-green-100 text-green-800",
-  IN_PROGRESS: "bg-blue-100 text-blue-800",
-  NOT_STARTED: "bg-slate-100 text-slate-700",
-  DRAFT: "bg-slate-100 text-slate-700",
-  DELAYED: "bg-red-100 text-red-800",
-  OVERDUE: "bg-red-100 text-red-800",
-  ON_HOLD: "bg-amber-100 text-amber-800",
-  OPEN: "bg-slate-200 text-slate-800",
-  HIGH: "bg-green-100 text-green-800",
-  NORMAL: "bg-slate-100 text-slate-700",
-  LOW: "bg-red-100 text-red-800",
-  NOT_APPLICABLE: "bg-slate-100 text-slate-500",
+  COMPLETED: "bg-[#dcfff1] text-[#216e4e]",
+  CLOSED: "bg-[#dcfff1] text-[#216e4e]",
+  SUBMITTED: "bg-[#dcfff1] text-[#216e4e]",
+  IN_PROGRESS: "bg-[#e9f2ff] text-[#0055cc]",
+  NOT_STARTED: "bg-[#f1f2f4] text-[#44546f]",
+  DRAFT: "bg-[#f1f2f4] text-[#44546f]",
+  DELAYED: "bg-[#ffeceb] text-[#ae2e24]",
+  OVERDUE: "bg-[#ffeceb] text-[#ae2e24]",
+  ON_HOLD: "bg-[#fff7d6] text-[#974f0c]",
+  OPEN: "bg-[#e9f2ff] text-[#0055cc]",
+  HIGH: "bg-[#dcfff1] text-[#216e4e]",
+  NORMAL: "bg-[#f1f2f4] text-[#44546f]",
+  LOW: "bg-[#ffeceb] text-[#ae2e24]",
+  NOT_APPLICABLE: "bg-[#f1f2f4] text-[#626f86]",
 };
 
 const LABEL_OVERRIDES: Record<string, string> = {
-  IN_PROGRESS: "In Progress",
-  NOT_STARTED: "Not Started",
-  ON_HOLD: "On Hold",
+  IN_PROGRESS: "In progress",
+  NOT_STARTED: "Not started",
+  ON_HOLD: "On hold",
   NOT_APPLICABLE: "N/A",
 };
 
 export function StatusBadge({ value, className }: { value: string; className?: string }) {
-  const color = COLOR_MAP[value] ?? "bg-slate-100 text-slate-700";
+  const color = COLOR_MAP[value] ?? "bg-[#f1f2f4] text-[#44546f]";
   const label = LABEL_OVERRIDES[value] ?? value.charAt(0) + value.slice(1).toLowerCase();
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${color} ${className ?? ""}`}
-    >
+    <span className={`ads-lozenge ${color} ${className ?? ""}`}>
       {label}
     </span>
   );
