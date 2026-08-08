@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useI18n } from "@/components/i18n/I18nProvider";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const { t } = useI18n();
@@ -59,21 +60,15 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           />
         </div>
 
-        <div>
-          <label htmlFor="password" className="ads-label">
-            {t("login.password")}
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="ads-input min-h-12 text-base"
-          />
-        </div>
+        <PasswordInput
+          id="password"
+          label={t("login.password")}
+          value={password}
+          onChange={setPassword}
+          required
+          showLabel={t("login.showPassword")}
+          hideLabel={t("login.hidePassword")}
+        />
 
         {error && (
           <p className="ads-flag ads-flag-error px-3 py-2 text-sm text-[var(--ads-danger)]" role="alert">
