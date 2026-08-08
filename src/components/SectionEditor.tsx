@@ -259,6 +259,13 @@ export function SectionEditor({
           </div>
         )}
 
+        {!readOnly && sectionType === "LABOUR_DEPLOYMENT" && (
+          <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            Labour types are pre-filled. Open a row, enter the bus number, then submit. Remove any
+            types not on site today.
+          </p>
+        )}
+
         {!readOnly && (
           <button
             type="button"
@@ -303,7 +310,9 @@ export function SectionEditor({
                     <div className="border-t border-slate-100 px-4 py-4">
                       <p className="mb-3 text-sm font-semibold text-slate-800">{addPanelTitle}</p>
                       <p className="mb-4 text-xs text-slate-500">
-                        Complete each field below. Required fields are marked with *.
+                        {sectionType === "LABOUR_DEPLOYMENT"
+                          ? "Confirm labour type and enter the bus number. Required fields are marked with *."
+                          : "Complete each field below. Required fields are marked with *."}
                       </p>
                       <DynamicRowForm
                         fields={fields}

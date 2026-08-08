@@ -4,6 +4,7 @@ import { parseDateOnly, dayOfWeekFromDateOnly } from "@/lib/dates";
 import { HttpError } from "@/lib/auth-guards";
 import { getFieldDefinitions } from "@/lib/fields";
 import { flattenRow } from "@/lib/rows";
+import { LABOUR_TYPES } from "@/lib/constants";
 
 /**
  * Idempotent upsert on (siteId, reportDate). Header defaults are snapshotted
@@ -49,6 +50,25 @@ export async function getOrCreateSection(reportId: string, type: SectionType) {
 }
 
 /**
+ * When an engineer first opens Labour Deployment on a DRAFT section with no
+ * rows yet, seed one row per known labour type so they only enter bus numbers.
+ */
+async function ensureDefaultLabourRows(sectionId: string, status: string) {
+  if (status !== "DRAFT") return;
+
+  const existingCount = await prisma.labourRow.count({ where: { sectionId } });
+  if (existingCount > 0) return;
+
+  await prisma.labourRow.createMany({
+    data: LABOUR_TYPES.map((labourCategory, sortOrder) => ({
+      sectionId,
+      sortOrder,
+      labourCategory,
+    })),
+  });
+}
+
+/**
  * Loads (and lazily creates) a section plus its resolved field definitions
  * and flattened rows. Shared by the section GET API route and the engineer
  * section pages so both stay in lockstep with `getFieldDefinitions`.
@@ -56,6 +76,10 @@ export async function getOrCreateSection(reportId: string, type: SectionType) {
 export async function loadSectionData(siteId: string, reportId: string, type: SectionType) {
   const section = await getOrCreateSection(reportId, type);
   const fields = await getFieldDefinitions(siteId, type);
+
+  if (type === "LABOUR_DEPLOYMENT") {
+    await ensureDefaultLabourRows(section.id, section.status);
+  }
 
   const rows =
     type === "WORK_PROGRAMME"
