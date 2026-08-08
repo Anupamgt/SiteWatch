@@ -49,6 +49,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           </label>
           <input
             id="email"
+            name="email"
             type="email"
             autoComplete="username"
             required
@@ -64,6 +65,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           </label>
           <input
             id="password"
+            name="password"
             type="password"
             autoComplete="current-password"
             required

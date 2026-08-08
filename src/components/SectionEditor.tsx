@@ -94,7 +94,11 @@ export function SectionEditor({
 }) {
   const { t, ticketStatus } = useI18n();
   const [rows, setRows] = useState<EditableRow[]>(() => initialRows.map(toEditableRow));
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  // Labour Deployment opens with the first pre-filled trade expanded so the
+  // engineer can enter a bus number immediately.
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(() =>
+    sectionType === "LABOUR_DEPLOYMENT" && initialRows.length > 0 ? 0 : null,
+  );
   const [status, setStatus] = useState(initialStatus);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
