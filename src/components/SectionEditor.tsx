@@ -58,15 +58,17 @@ function rowSummary(
   row: EditableRow,
   fields: ResolvedFieldDefinition[],
   untitledLabel: string,
-): { title: string; subtitle: string } {
+): { title: string; subtitle: string; hasCount: boolean } {
   const primary = fields[0];
   const secondary = fields.find((f) => f.fieldType === "TEXTAREA") ?? fields[1];
   const titleVal = primary ? row[primary.key] : null;
   const subtitleVal = secondary ? row[secondary.key] : null;
   let subtitle = "";
+  let hasCount = false;
   if (subtitleVal !== null && subtitleVal !== undefined && subtitleVal !== "") {
     if (secondary?.key === "actualPresent" || secondary?.label === "Bus Number") {
       subtitle = `${subtitleVal} on site`;
+      hasCount = true;
     } else {
       subtitle = String(subtitleVal);
     }
@@ -74,7 +76,36 @@ function rowSummary(
   return {
     title: (titleVal as string) || untitledLabel,
     subtitle,
+    hasCount,
   };
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      aria-hidden
+      className={`shrink-0 text-[var(--ads-text-subtlest)] transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+    >
+      <path
+        fill="currentColor"
+        d="M8.75 11.2a1 1 0 0 1-1.5 0L3.2 6.4A.75.75 0 0 1 3.75 5.2h8.5a.75.75 0 0 1 .55 1.2l-4.05 4.8Z"
+      />
+    </svg>
+  );
+}
+
+function InfoIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden className="mt-0.5 shrink-0 text-[var(--ads-information)]">
+      <path
+        fill="currentColor"
+        d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm0 4.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM13 17h-2v-6h2v6Z"
+      />
+    </svg>
+  );
 }
 
 export function SectionEditor({
@@ -116,6 +147,7 @@ export function SectionEditor({
   const readOnly = status === "SUBMITTED";
   const draftUrl = `/api/reports/${reportId}/sections/${sectionType}/draft`;
   const submitUrl = `/api/reports/${reportId}/sections/${sectionType}/submit`;
+  const isLabour = sectionType === "LABOUR_DEPLOYMENT";
 
   const rowsRef = useRef(rows);
   useEffect(() => {
@@ -194,7 +226,6 @@ export function SectionEditor({
     }
     const nextIndex = rows.length;
     setRows((prev) => [...prev, newRow]);
-    // Open the field form panel immediately so the engineer can fill every input.
     setExpandedIndex(nextIndex);
   }
 
@@ -208,7 +239,6 @@ export function SectionEditor({
     setSubmitting(true);
     setErrorMessage(null);
     try {
-      // Cancel pending autosave — submit persists rows in the same request.
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);
         debounceTimer.current = null;
@@ -242,7 +272,7 @@ export function SectionEditor({
       case "saving":
         return "Saving…";
       case "saved":
-        return "Saved";
+        return "All changes saved";
       case "error":
         return "Save failed";
       default:
@@ -250,185 +280,276 @@ export function SectionEditor({
     }
   }, [saveState]);
 
+  const filledCount = useMemo(() => {
+    if (!isLabour) return rows.length;
+    return rows.filter((r) => typeof r.actualPresent === "number").length;
+  }, [isLabour, rows]);
+
   return (
     <div className="flex min-h-screen flex-col pb-28">
-      <main className="mx-auto w-full max-w-2xl flex-1 space-y-4 px-4 py-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">{sectionLabel}</h2>
+      <main className="mx-auto w-full max-w-2xl flex-1 space-y-4 px-4 py-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-xl font-semibold tracking-tight text-[var(--ads-text)]">
+              {sectionLabel}
+            </h2>
+            {isLabour && !readOnly && (
+              <p className="mt-1 text-sm text-[var(--ads-text-subtle)]">
+                {filledCount} of {rows.length} trades have a Bus Number
+              </p>
+            )}
+          </div>
           <StatusBadge value={status} />
         </div>
 
         {status === "SUBMITTED" && (
-          <div className="rounded-md bg-green-50 px-4 py-3 text-sm text-green-800">
-            This section has been submitted and is read-only. Ask an admin to reopen it to make
-            changes.
+          <div className="ads-flag ads-flag-success p-3 pr-4">
+            <div className="min-w-0 text-sm text-[var(--ads-text)]">
+              <p className="font-semibold">Submitted</p>
+              <p className="mt-0.5 text-[var(--ads-text-subtle)]">
+                This section is read-only. Ask an admin to reopen it to make changes.
+              </p>
+            </div>
           </div>
         )}
 
         {errorMessage && (
-          <div className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-            {errorMessage}
+          <div className="ads-flag ads-flag-error p-3 pr-4" role="alert">
+            <div className="min-w-0 text-sm text-[var(--ads-text)]">
+              <p className="font-semibold">Couldn’t save</p>
+              <p className="mt-0.5 text-[var(--ads-text-subtle)]">{errorMessage}</p>
+            </div>
           </div>
         )}
 
-        {!readOnly && sectionType === "LABOUR_DEPLOYMENT" && (
-          <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-            Labour types are pre-filled. Open a row, enter the Bus Number (how many labour of that
-            type are on site), then submit. Remove any types not on site today.
-          </p>
-        )}
-
-        {!readOnly && (
-          <button
-            type="button"
-            onClick={addRow}
-            className="min-h-12 w-full rounded-lg border-2 border-dashed border-amber-300 bg-amber-50 text-sm font-semibold text-amber-900 hover:border-amber-500 hover:bg-amber-100"
-          >
-            {addCtaLabel}
-          </button>
+        {!readOnly && isLabour && (
+          <div className="ads-flag p-3 pr-4">
+            <InfoIcon />
+            <div className="min-w-0 text-sm text-[var(--ads-text)]">
+              <p className="font-semibold">Quick entry</p>
+              <p className="mt-0.5 text-[var(--ads-text-subtle)]">
+                Labour types are pre-filled. Open a row, enter the Bus Number (how many labour of
+                that type are on site), then submit. Remove any types not on site today.
+              </p>
+            </div>
+          </div>
         )}
 
         {rows.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
-            No entries yet.{" "}
+          <div className="ads-surface px-6 py-10 text-center">
+            <p className="text-sm font-medium text-[var(--ads-text)]">No entries yet</p>
+            <p className="mt-1 text-sm text-[var(--ads-text-subtle)]">
+              {!readOnly ? (
+                <>
+                  Use <span className="font-medium text-[var(--ads-text)]">{addCtaLabel}</span> to
+                  add the first row.
+                </>
+              ) : (
+                "Nothing was recorded for this section."
+              )}
+            </p>
             {!readOnly && (
-              <>
-                Tap <span className="font-medium text-slate-700">{addCtaLabel}</span> to open the
-                form and fill every field.
-              </>
+              <button type="button" onClick={addRow} className="ads-btn ads-btn-primary mt-4">
+                {addCtaLabel}
+              </button>
             )}
           </div>
         ) : (
-          <ul className="space-y-2">
-            {rows.map((row, index) => {
-              const expanded = expandedIndex === index;
-              const { title, subtitle } = rowSummary(row, fields, t("section.untitledRow"));
-              return (
-                <li key={row._localKey} className="rounded-lg border border-slate-200 bg-white shadow-sm">
-                  <button
-                    type="button"
-                    onClick={() => setExpandedIndex(expanded ? null : index)}
-                    className="flex w-full min-h-14 items-center justify-between gap-3 px-4 py-3 text-left"
-                    aria-expanded={expanded}
+          <div className="ads-surface overflow-hidden">
+            <ul className="divide-y divide-[var(--ads-border)]">
+              {rows.map((row, index) => {
+                const expanded = expandedIndex === index;
+                const { title, subtitle, hasCount } = rowSummary(
+                  row,
+                  fields,
+                  t("section.untitledRow"),
+                );
+                return (
+                  <li
+                    key={row._localKey}
+                    className={expanded ? "bg-[var(--ads-surface-sunken)]" : "bg-[var(--ads-surface)]"}
                   >
-                    <span className="min-w-0">
-                      <span className="block truncate font-medium text-slate-900">{title}</span>
-                      {subtitle && <span className="block truncate text-sm text-slate-500">{subtitle}</span>}
-                    </span>
-                    <span className="shrink-0 text-slate-400">{expanded ? "▲" : "▼"}</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setExpandedIndex(expanded ? null : index)}
+                      className="flex w-full min-h-14 items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-[var(--ads-neutral)]"
+                      aria-expanded={expanded}
+                    >
+                      <span className="flex min-w-0 items-center gap-3">
+                        <span
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--ads-radius)] text-xs font-bold ${
+                            hasCount
+                              ? "bg-[#e9f2ff] text-[var(--ads-brand-hovered)]"
+                              : "bg-[var(--ads-neutral)] text-[var(--ads-text-subtle)]"
+                          }`}
+                          aria-hidden
+                        >
+                          {index + 1}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-[15px] font-medium text-[var(--ads-text)]">
+                            {title}
+                          </span>
+                          {subtitle ? (
+                            <span className="mt-0.5 block truncate text-sm text-[var(--ads-text-subtle)]">
+                              {subtitle}
+                            </span>
+                          ) : (
+                            !readOnly &&
+                            isLabour && (
+                              <span className="mt-0.5 block truncate text-sm text-[var(--ads-text-subtlest)]">
+                                Bus Number not entered
+                              </span>
+                            )
+                          )}
+                        </span>
+                      </span>
+                      <Chevron open={expanded} />
+                    </button>
 
-                  {expanded && (
-                    <div className="border-t border-slate-100 px-4 py-4">
-                      <p className="mb-3 text-sm font-semibold text-slate-800">{addPanelTitle}</p>
-                      <p className="mb-4 text-xs text-slate-500">
-                        {sectionType === "LABOUR_DEPLOYMENT"
-                          ? "Confirm labour type and enter Bus Number (count of labour on site). Required fields are marked with *."
-                          : "Complete each field below. Required fields are marked with *."}
-                      </p>
-                      <DynamicRowForm
-                        fields={fields}
-                        values={row}
-                        onFieldChange={(key, value) => updateRowField(index, key, value)}
-                        disabled={readOnly}
-                        taskRowId={sectionType === "WORK_PROGRAMME" ? row.id : undefined}
-                        onRequireRowSave={
-                          sectionType === "WORK_PROGRAMME"
-                            ? async () => {
-                                if (row.id) return row.id;
-                                const saved = await saveDraft();
-                                return saved?.[index]?.id;
-                              }
-                            : undefined
-                        }
-                      />
-                      {sectionType === "WORK_PROGRAMME" && siteId && (
-                        <label className="mt-4 block text-sm">
-                          <span className="mb-1.5 block text-base font-medium text-slate-800">
-                            {t("tickets.linkToTicket")}
-                          </span>
-                          <select
-                            value={row.ticketId ?? ""}
-                            disabled={readOnly}
-                            onChange={(e) =>
-                              updateRowField(index, "ticketId", e.target.value || null)
-                            }
-                            className="min-h-12 w-full rounded-lg border px-3 text-base disabled:bg-slate-50"
-                          >
-                            <option value="">{t("tickets.linkNone")}</option>
-                            {ticketOptions.map((opt) => (
-                              <option key={opt.id} value={opt.id}>
-                                {opt.title} ({ticketStatus(opt.status)})
-                              </option>
-                            ))}
-                            {row.ticketId &&
-                              !ticketOptions.some((opt) => opt.id === row.ticketId) && (
-                                <option value={row.ticketId}>{t("tickets.linkOther")}</option>
-                              )}
-                          </select>
-                          <span className="mt-1.5 block text-sm leading-relaxed text-slate-500">
-                            {t("tickets.linkToTicketHelp")}
-                          </span>
-                        </label>
-                      )}
-                      {!readOnly && (
-                        <div className="mt-4 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => removeRow(index)}
-                            className="min-h-10 rounded-lg border border-red-200 px-3 text-sm font-medium text-red-700 hover:bg-red-50"
-                          >
-                            {t("section.removeRow")}
-                          </button>
+                    {expanded && (
+                      <div className="border-t border-[var(--ads-border)] bg-[var(--ads-surface)] px-4 py-4">
+                        <div className="mb-4">
+                          <p className="text-sm font-semibold text-[var(--ads-text)]">
+                            {addPanelTitle}
+                          </p>
+                          <p className="mt-1 text-xs leading-relaxed text-[var(--ads-text-subtlest)]">
+                            {isLabour
+                              ? "Confirm labour type and enter Bus Number (count of labour on site). Required fields are marked with *."
+                              : "Complete each field below. Required fields are marked with *."}
+                          </p>
                         </div>
-                      )}
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                        <DynamicRowForm
+                          fields={fields}
+                          values={row}
+                          onFieldChange={(key, value) => updateRowField(index, key, value)}
+                          disabled={readOnly}
+                          taskRowId={sectionType === "WORK_PROGRAMME" ? row.id : undefined}
+                          onRequireRowSave={
+                            sectionType === "WORK_PROGRAMME"
+                              ? async () => {
+                                  if (row.id) return row.id;
+                                  const saved = await saveDraft();
+                                  return saved?.[index]?.id;
+                                }
+                              : undefined
+                          }
+                        />
+                        {sectionType === "WORK_PROGRAMME" && siteId && (
+                          <label className="mt-4 block">
+                            <span className="mb-1.5 block text-[0.75rem] font-semibold uppercase tracking-wide text-[var(--ads-text-subtle)]">
+                              {t("tickets.linkToTicket")}
+                            </span>
+                            <select
+                              value={row.ticketId ?? ""}
+                              disabled={readOnly}
+                              onChange={(e) =>
+                                updateRowField(index, "ticketId", e.target.value || null)
+                              }
+                              className="ads-input"
+                            >
+                              <option value="">{t("tickets.linkNone")}</option>
+                              {ticketOptions.map((opt) => (
+                                <option key={opt.id} value={opt.id}>
+                                  {opt.title} ({ticketStatus(opt.status)})
+                                </option>
+                              ))}
+                              {row.ticketId &&
+                                !ticketOptions.some((opt) => opt.id === row.ticketId) && (
+                                  <option value={row.ticketId}>{t("tickets.linkOther")}</option>
+                                )}
+                            </select>
+                            <span className="mt-1.5 block text-xs leading-relaxed text-[var(--ads-text-subtlest)]">
+                              {t("tickets.linkToTicketHelp")}
+                            </span>
+                          </label>
+                        )}
+                        {!readOnly && (
+                          <div className="mt-4 flex justify-end border-t border-[var(--ads-border)] pt-3">
+                            <button
+                              type="button"
+                              onClick={() => removeRow(index)}
+                              className="ads-btn ads-btn-danger"
+                            >
+                              {t("section.removeRow")}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+
+            {!readOnly && (
+              <div className="border-t border-[var(--ads-border)] bg-[var(--ads-surface-sunken)] px-3 py-2">
+                <button
+                  type="button"
+                  onClick={addRow}
+                  className="ads-btn ads-btn-subtle w-full justify-start font-medium text-[var(--ads-brand)] hover:text-[var(--ads-brand-hovered)]"
+                >
+                  <span aria-hidden className="text-lg leading-none">
+                    +
+                  </span>
+                  {addCtaLabel}
+                </button>
+              </div>
+            )}
+          </div>
         )}
 
-        <div className="pt-2">
-          <Link href={backHref} className="text-sm font-medium text-slate-500 hover:text-slate-800">
-            {t("section.backToReport")}
+        <div className="pt-1">
+          <Link
+            href={backHref}
+            className="inline-flex items-center gap-1 text-sm font-medium text-[var(--ads-brand)] hover:text-[var(--ads-brand-hovered)] hover:underline"
+          >
+            ← {t("section.backToReport").replace(/^←\s*/, "")}
           </Link>
         </div>
       </main>
 
       {!readOnly && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
+        <div
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--ads-border)] bg-[var(--ads-surface)] px-4 py-3"
+          style={{ boxShadow: "var(--ads-shadow-overlay)" }}
+        >
           <div className="mx-auto flex max-w-2xl items-center gap-3">
-            <span className="min-w-0 flex-1 truncate text-xs text-slate-400">{saveIndicator}</span>
+            <span
+              className={`min-w-0 flex-1 truncate text-xs ${
+                saveState === "error"
+                  ? "text-[var(--ads-danger)]"
+                  : saveState === "saved"
+                    ? "text-[var(--ads-success-bold)]"
+                    : "text-[var(--ads-text-subtlest)]"
+              }`}
+            >
+              {saveIndicator}
+            </span>
 
             {!confirmingSubmit ? (
               <>
-                <button
-                  type="button"
-                  onClick={saveDraft}
-                  className="min-h-12 shrink-0 rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                >
+                <button type="button" onClick={saveDraft} className="ads-btn ads-btn-default shrink-0">
                   {t("section.saveDraft")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmingSubmit(true)}
                   disabled={rows.length === 0}
-                  className="min-h-12 shrink-0 rounded-lg bg-amber-500 px-4 text-sm font-semibold text-slate-900 hover:bg-amber-400 disabled:opacity-50"
+                  className="ads-btn ads-btn-primary shrink-0 px-5"
                 >
                   {t("section.submit")}
                 </button>
               </>
             ) : (
               <>
-                <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-700">
+                <span className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--ads-text)]">
                   {t("section.confirmSubmit")}
                 </span>
                 <button
                   type="button"
                   onClick={() => setConfirmingSubmit(false)}
-                  className="min-h-12 shrink-0 rounded-lg border border-slate-300 px-3 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                  className="ads-btn ads-btn-default shrink-0"
                 >
                   {t("common.cancel")}
                 </button>
@@ -436,7 +557,7 @@ export function SectionEditor({
                   type="button"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="min-h-12 shrink-0 rounded-lg bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-500 disabled:opacity-60"
+                  className="ads-btn ads-btn-primary shrink-0 px-5"
                 >
                   {submitting ? t("section.submitting") : t("section.yesSubmit")}
                 </button>

@@ -1,8 +1,49 @@
 @import "tailwindcss";
 
+/*
+ * SiteWatch tokens — Atlassian Design System inspired foundations:
+ * 8px spacing rhythm, neutral surfaces, blue interactive focus,
+ * lozenge-friendly radii, clear text hierarchy.
+ * Product accent (amber) kept for brand marks only.
+ */
 :root {
-  --background: #f8fafc; /* slate-50 */
-  --foreground: #0f172a; /* slate-900 */
+  --background: #f7f8f9;
+  --foreground: #172b4d;
+
+  --ads-text: #172b4d;
+  --ads-text-subtle: #44546f;
+  --ads-text-subtlest: #626f86;
+  --ads-text-inverse: #ffffff;
+
+  --ads-border: #091e4224;
+  --ads-border-bold: #091e422f;
+  --ads-border-focused: #388bff;
+
+  --ads-surface: #ffffff;
+  --ads-surface-sunken: #f7f8f9;
+  --ads-surface-raised: #ffffff;
+  --ads-surface-overlay: #ffffff;
+
+  --ads-neutral: #091e420f;
+  --ads-neutral-hovered: #091e4224;
+
+  --ads-brand: #0c66e4;
+  --ads-brand-hovered: #0055cc;
+  --ads-brand-pressed: #09326c;
+
+  --ads-success: #22a06b;
+  --ads-success-bold: #1f845a;
+  --ads-danger: #c9372c;
+  --ads-danger-bold: #ae2e24;
+  --ads-warning: #e56910;
+  --ads-information: #1d7afc;
+
+  --ads-brand-product: #f59e0b; /* SiteWatch amber — logo / brand only */
+
+  --ads-radius: 6px;
+  --ads-radius-sm: 3px;
+  --ads-shadow-raised: 0 1px 1px #091e4240, 0 0 1px #091e424f;
+  --ads-shadow-overlay: 0 8px 12px #091e4226, 0 0 1px #091e424f;
 }
 
 @theme inline {
@@ -20,14 +61,151 @@ body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), "Segoe UI", "Liberation Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Utilitarian construction-site look: slate surfaces, amber accents, no
- * gradients. Keep tap targets generous for gloved / outdoor mobile use. */
+/* Utilitarian site-app look: Atlassian density, generous tap targets. */
 input,
 select,
 textarea,
 button {
   font: inherit;
+}
+
+/* ADS-style form control focus */
+.ads-input {
+  width: 100%;
+  min-height: 2.5rem;
+  border-radius: var(--ads-radius);
+  border: 2px solid var(--ads-border-bold);
+  background: var(--ads-surface);
+  padding: 0.5rem 0.75rem;
+  color: var(--ads-text);
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.ads-input:hover:not(:disabled) {
+  background: var(--ads-surface-sunken);
+}
+
+.ads-input:focus {
+  outline: none;
+  border-color: var(--ads-border-focused);
+  box-shadow: 0 0 0 1px var(--ads-border-focused);
+  background: var(--ads-surface);
+}
+
+.ads-input:disabled {
+  background: var(--ads-neutral);
+  color: var(--ads-text-subtlest);
+  cursor: not-allowed;
+}
+
+.ads-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 2.5rem;
+  border-radius: var(--ads-radius);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.ads-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ads-btn-primary {
+  background: var(--ads-brand);
+  color: var(--ads-text-inverse);
+  border: none;
+}
+
+.ads-btn-primary:hover:not(:disabled) {
+  background: var(--ads-brand-hovered);
+}
+
+.ads-btn-primary:active:not(:disabled) {
+  background: var(--ads-brand-pressed);
+}
+
+.ads-btn-default {
+  background: var(--ads-neutral);
+  color: var(--ads-text);
+  border: none;
+}
+
+.ads-btn-default:hover:not(:disabled) {
+  background: var(--ads-neutral-hovered);
+}
+
+.ads-btn-subtle {
+  background: transparent;
+  color: var(--ads-text-subtle);
+  border: none;
+}
+
+.ads-btn-subtle:hover:not(:disabled) {
+  background: var(--ads-neutral);
+  color: var(--ads-text);
+}
+
+.ads-btn-danger {
+  background: transparent;
+  color: var(--ads-danger);
+  border: none;
+}
+
+.ads-btn-danger:hover:not(:disabled) {
+  background: #c9372c14;
+}
+
+.ads-lozenge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--ads-radius-sm);
+  padding: 0 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.333;
+  text-transform: uppercase;
+}
+
+.ads-flag {
+  display: flex;
+  gap: 0.75rem;
+  border-radius: var(--ads-radius);
+  background: var(--ads-surface);
+  border: 1px solid var(--ads-border);
+  box-shadow: var(--ads-shadow-raised);
+  overflow: hidden;
+}
+
+.ads-flag::before {
+  content: "";
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--ads-information);
+}
+
+.ads-flag-success::before {
+  background: var(--ads-success);
+}
+
+.ads-flag-error::before {
+  background: var(--ads-danger);
+}
+
+.ads-surface {
+  background: var(--ads-surface);
+  border: 1px solid var(--ads-border);
+  border-radius: var(--ads-radius);
+  box-shadow: var(--ads-shadow-raised);
 }
