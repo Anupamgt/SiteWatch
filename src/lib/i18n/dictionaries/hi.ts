@@ -27,6 +27,8 @@ export const hi = {
     subtitle: "रोज की साइट रिपोर्ट भरने या देखने के लिए साइन इन करें",
     email: "ईमेल",
     password: "पासवर्ड",
+    showPassword: "पासवर्ड दिखाएँ",
+    hidePassword: "पासवर्ड छिपाएँ",
     signIn: "साइन इन",
     signInGoogle: "Google से जारी रखें",
     invalidCreds: "ईमेल या पासवर्ड गलत है।",

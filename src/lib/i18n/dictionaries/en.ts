@@ -25,6 +25,8 @@ export const en = {
     subtitle: "Sign in to fill or check daily site reports",
     email: "Email",
     password: "Password",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
     signIn: "Sign in",
     signInGoogle: "Continue with Google",
     invalidCreds: "Wrong email or password.",

@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/components/PasswordInput";
 
 type SiteOption = { id: string; code: string; name: string };
 
@@ -106,23 +107,19 @@ export function PersonForm({
         </div>
         <Field label="Phone" name="phone" defaultValue={initial?.phone ?? ""} />
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-sm font-medium">
-            {mode === "create" ? "Password (optional if Google-only)" : "Set / reset password"}
-          </label>
-          <input
-            name="password"
-            type="password"
+          <PasswordInput
+            label={mode === "create" ? "Password (optional if Google-only)" : "Set / reset password"}
+            labelClassName="mb-1 block text-sm font-medium"
+            inputClassName="ads-input min-h-11"
+            autoComplete="new-password"
             minLength={6}
             placeholder={
               initial?.hasPassword
                 ? "Leave blank to keep current password"
                 : "Optional — leave blank for Google Sign-In only"
             }
-            className="ads-input min-h-11"
+            helpText="Google Sign-In only works if this exact email already exists here and is active."
           />
-          <p className="mt-1 text-xs text-slate-500">
-            Google Sign-In only works if this exact email already exists here and is active.
-          </p>
         </div>
       </div>
 
